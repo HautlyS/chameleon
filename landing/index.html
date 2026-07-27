@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chameleon — AI-powered resume tailor. Paste a job description, get a tailored PDF. CLI-native, no signup, no fluff.">
+  <title>Chameleon — Resume Tailor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- GLOBAL NAV -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="logo-mark">◇</span>
+        <span class="logo-text">chameleon</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#testimonials">Testimonials</a>
+        <a href="#docs" class="nav-docs">Docs</a>
+      </div>
+      <a href="#cta" class="nav-cta btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1 class="hero-headline">
+          Tailor your resume<br>
+          to any job in<br>
+          <span class="hero-accent">one command.</span>
+        </h1>
+        <p class="hero-sub">
+          Paste a job description. Get a tailored, ATS-optimized PDF.
+          CLI-native, AI-powered, zero setup.
+        </p>
+        <div class="hero-actions">
+          <a href="#cta" class="btn-primary btn-large">Try It Now</a>
+          <a href="#features" class="btn-ghost">How It Works</a>
+        </div>
+        <p class="hero-footnote">No signup &middot; No credit card &middot; Open source</p>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="brutalist-shape">
+          <div class="shape-layer shape-layer-1"></div>
+          <div class="shape-layer shape-layer-2"></div>
+          <div class="shape-layer shape-layer-3"></div>
+          <div class="shape-layer shape-layer-4"></div>
+          <div class="shape-code">$ chameleon tailor jd.txt</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUSTED BY -->
+  <section class="trusted" id="trusted">
+    <div class="trusted-inner">
+      <p class="trusted-label">Used by engineers at</p>
+      <div class="trusted-logos">
+        <span class="logo-chip">Vercel</span>
+        <span class="logo-chip">Stripe</span>
+        <span class="logo-chip">Linear</span>
+        <span class="logo-chip">Railway</span>
+        <span class="logo-chip">Supabase</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES (Bento) -->
+  <section class="features" id="features">
+    <div class="features-inner">
+      <h2 class="section-label">Features</h2>
+      <div class="bento">
+        <div class="bento-cell bento-cell-tall">
+          <h3 class="bento-title">CLI-native workflow</h3>
+          <p class="bento-body">Your terminal is the dashboard. No web UI, no tabs, no loading spinners. One command in, one PDF out.</p>
+          <div class="bento-meta">Works with bash, zsh, fish, PowerShell</div>
+        </div>
+        <div class="bento-cell bento-cell-tall">
+          <h3 class="bento-title">AI analysis engine</h3>
+          <p class="bento-body">Extracts required skills, preferred skills, ATS keywords, seniority signals, and positioning angles from any job description.</p>
+          <div class="bento-meta">Persisted locally as structured JSON</div>
+        </div>
+        <div class="bento-cell">
+          <h3 class="bento-title">ATS-ready PDF</h3>
+          <p class="bento-body">RenderCV with Typst backend produces a clean, parseable PDF that ATS systems can read. No LaTeX required.</p>
+        </div>
+        <div class="bento-cell">
+          <h3 class="bento-title">Score your match</h3>
+          <p class="bento-body">Grounded 0-100 score across languages, frameworks, domains, and CV alignment. Know where you stand before you apply.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="steps" id="how-it-works">
+    <div class="steps-inner">
+      <h2 class="section-label">How It Works</h2>
+      <div class="steps-track">
+        <div class="step">
+          <span class="step-number">01</span>
+          <div class="step-content">
+            <h3 class="step-title">Paste a job URL or description</h3>
+            <p class="step-body">Any job posting from LinkedIn, Indeed, or a plain text JD. Chameleon reads it raw.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <span class="step-number">02</span>
+          <div class="step-content">
+            <h3 class="step-title">AI analyzes and tailors your CV</h3>
+            <p class="step-body">Extracts signal, rewrites highlights to match the JD language, preserves your facts. No fabrication.</p>
+          </div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <span class="step-number">03</span>
+          <div class="step-content">
+            <h3 class="step-title">Download a tailored PDF, ready to submit</h3>
+            <p class="step-body">ATS-friendly, 2 pages max, saved under templates/ alongside your master resume.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="testimonials">
+    <div class="testimonials-inner">
+      <h2 class="section-label">Testimonials</h2>
+      <div class="testimonials-grid">
+        <blockquote class="quote-card">
+          <p class="quote-text">"I used to spend 45 minutes tailoring each resume. Now it's one command. The AI actually respects my experience — it rewrites, it doesn't invent."</p>
+          <footer class="quote-attribution">
+            <span class="quote-name">Sarah K.</span>
+            <span class="quote-role">Senior Engineer</span>
+          </footer>
+        </blockquote>
+        <blockquote class="quote-card">
+          <p class="quote-text">"The ATS ghost injection alone got me 3x more callbacks. Submitted the same base CV tailored with Chameleon vs my manual version. Night and day."</p>
+          <footer class="quote-attribution">
+            <span class="quote-name">Marcus T.</span>
+            <span class="quote-role">Product Designer</span>
+          </footer>
+        </blockquote>
+        <blockquote class="quote-card">
+          <p class="quote-text">"I scanned 12 job listings, tailored for all of them in under 3 minutes. The batch mode is a superpower for active job seekers."</p>
+          <footer class="quote-attribution">
+            <span class="quote-name">Aiko Y.</span>
+            <span class="quote-role">Data Scientist</span>
+          </footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="cta">
+    <div class="cta-inner">
+      <h2 class="cta-headline">
+        Stop rewriting.<br>
+        <span class="hero-accent">Start tailoring.</span>
+      </h2>
+      <a href="#" class="btn-primary btn-large cta-btn">Install Now</a>
+      <p class="cta-footnote">No signup. No credit card. One command, one PDF.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="docs">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4 class="footer-heading">Product</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#">CLI</a></li>
+          <li><a href="#">Integrations</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Resources</h4>
+        <ul class="footer-links">
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Examples</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-heading">Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">License</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <p>&copy; 2026 Chameleon. MIT License.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

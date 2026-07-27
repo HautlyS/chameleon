@@ -1,0 +1,3 @@
+[submodule "chameleon-bot/evolution-api"]
+	path = chameleon-bot/evolution-api
+	url = https://github.com/EvolutionAPI/evolution-api.git

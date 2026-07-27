@@ -9,9 +9,11 @@ templates/*
 .chameleon/rss_seen.json
 .env
 *.env
+.env.*
 chameleon-bot/opencode-telegram-bot/dist/
 chameleon-bot/opencode-telegram-bot/node_modules/
 chameleon-bot/opencode-telegram-bot/logs/
 chameleon-bot/opencode-telegram-bot/settings.json
 chameleon-bot/whatsapp-bot/dist/
 chameleon-bot/whatsapp-bot/node_modules/
+*.db

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Chameleon Job TUI — launcher script (Unix/Linux/macOS)
+set -euo pipefail
+
+CHAMELEON_DIR="$(cd "$(dirname "$0")" && pwd)"
+VENV_PYTHON="$CHAMELEON_DIR/.venv/bin/python3"
+
+if [[ ! -f "$VENV_PYTHON" ]]; then
+    echo "[!] Virtual environment not found at $VENV_PYTHON"
+    echo "    Run: make install-tools"
+    exit 1
+fi
+
+cd "$CHAMELEON_DIR" || exit 1
+exec "$VENV_PYTHON" -m scripts.tui_app "$@"

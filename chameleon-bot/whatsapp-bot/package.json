@@ -1,0 +1,41 @@
+{
+  "name": "@chameleon/whatsapp-bot",
+  "version": "0.1.0",
+  "description": "Chameleon WhatsApp bot — resume tailoring and job scanning from WhatsApp via Evolution API.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "lint": "eslint src --ext .ts --max-warnings=0",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HautlyS/chameleon.git"
+  },
+  "keywords": [
+    "chameleon",
+    "whatsapp",
+    "evolution-api",
+    "resume-tailor",
+    "job-search",
+    "bot"
+  ],
+  "author": "chameleon",
+  "license": "MIT",
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.1.21",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^25.0.8",
+    "eslint": "^8.57.1",
+    "prettier": "^3.8.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": [".claude/skills", ".agents/skills"]
+  },
+  "command": {
+    "chameleon": {
+      "template": "/chameleon",
+      "description": "Tailor your master CV for a specific job posting. Accepts a job URL or pasted JD text.",
+      "subtask": true
+    },
+    "tailor-cv": {
+      "template": "/tailor-cv",
+      "description": "Tailor a CV using a previously saved job analysis artifact. Usage: /tailor-cv --analysis <id|path> --cv <name>",
+      "subtask": true
+    },
+    "score-cv": {
+      "template": "/score-cv",
+      "description": "Score a tailored CV against a saved job analysis. Usage: /score-cv --analysis <id|path> --cv <path>",
+      "subtask": true
+    },
+    "cover-letter": {
+      "template": "/cover-letter",
+      "description": "Generate a concise cover letter for a role. Usage: /cover-letter <job-url|text> [--resume <name>]",
+      "subtask": true
+    },
+    "question": {
+      "template": "/question",
+      "description": "Answer an application question grounded in your resume. Usage: /question \"<question>\" [--resume <name>] [--job-url <url>]",
+      "subtask": true
+    },
+    "init-cv": {
+      "template": "/init-cv",
+      "description": "Import a master CV from PDF or YAML. Usage: /init-cv <path-to-file>",
+      "subtask": true
+    },
+    "render-cv": {
+      "template": "/render-cv",
+      "description": "Re-render a CV YAML to PDF. Usage: /render-cv [path-to-yaml]",
+      "subtask": true
+    },
+    "scan-jobs": {
+      "template": "/scan-jobs",
+      "description": "Scan job listings. Usage: /scan-jobs [--query <query>] [--platforms <platforms>]",
+      "subtask": true
+    },
+    "job-matcher": {
+      "template": "/job-matcher",
+      "description": "Score jobs against your profile. Usage: /job-matcher score --job-url <url>",
+      "subtask": true
+    },
+    "bot-start": {
+      "template": "/bot-start",
+      "description": "Start the RSS job scanner bridge, Telegram bot, or WhatsApp bot. Usage: /bot-start [bridge|telegram|whatsapp]",
+      "subtask": true
+    },
+    "bot-stop": {
+      "template": "/bot-stop",
+      "description": "Stop bot services. Usage: /bot-stop [bridge|telegram|whatsapp]",
+      "subtask": true
+    },
+    "bot-status": {
+      "template": "/bot-status",
+      "description": "Check which bot services are running. Usage: /bot-status",
+      "subtask": true
+    }
+  },
+  "instructions": ["AGENTS.md"],
+  "permission": {
+    "bash": { "read": "allow", "write": "allow", "glob": "allow", "grep": "allow", "list": "allow" },
+    "read": { "bash": "allow", "read": "allow", "glob": "allow", "grep": "allow", "list": "allow" },
+    "edit": { "bash": "allow", "read": "allow", "glob": "allow", "grep": "allow", "list": "allow" },
+    "external_directory": { "bash": "allow", "read": "allow", "glob": "allow", "grep": "allow", "list": "allow" },
+    "task": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "question": "allow",
+    "todowrite": "allow",
+    "skill": "allow"
+  },
+  "experimental": {
+    "batch_tool": true
+  }
+}

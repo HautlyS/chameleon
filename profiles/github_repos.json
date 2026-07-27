@@ -1,0 +1,1266 @@
+{
+  "user": "HautlyS",
+  "name": "Tupã Levi Pelizer Alves",
+  "total_public_repos": 47,
+  "scraped_at": "2026-07-26",
+  "repos": [
+    {
+      "name": "audit-auto",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/audit-auto",
+      "created_at": "2026-07-23T01:56:00Z",
+      "updated_at": "2026-07-26T02:45:01Z",
+      "size_kb": 654,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript",
+        "DevOps",
+        "CI/CD"
+      ],
+      "domains": [
+        "devops",
+        "automation"
+      ],
+      "infrastructure": [
+        "CI/CD"
+      ],
+      "category": "devops",
+      "summary": "Automated audit tool for system compliance and security scanning."
+    },
+    {
+      "name": "Cybermanju-Drive",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Cybermanju-Drive",
+      "created_at": "2026-06-14T21:32:49Z",
+      "updated_at": "2026-06-14T22:27:25Z",
+      "size_kb": 253075,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust",
+        "Rust CLI"
+      ],
+      "domains": [
+        "file-management",
+        "data-storage"
+      ],
+      "infrastructure": [
+        "Rust CLI"
+      ],
+      "category": "desktop-app",
+      "summary": "Rust-based drive/file management tool with cross-platform support."
+    },
+    {
+      "name": "Autitude",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/Autitude",
+      "created_at": "2026-05-06T12:39:49Z",
+      "updated_at": "2026-06-06T15:13:43Z",
+      "size_kb": 24285,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps",
+        "automation"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript automation utility for web workflows."
+    },
+    {
+      "name": "Earth_Guardians_App",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/Earth_Guardians_App",
+      "created_at": "2026-05-24T19:34:53Z",
+      "updated_at": "2026-06-03T22:41:00Z",
+      "size_kb": 310,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript"
+      ],
+      "domains": [
+        "geospatial",
+        "environmental"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "TypeScript app for environmental monitoring and earth guardian initiatives."
+    },
+    {
+      "name": "any-proxy",
+      "description": "Route website Claude, Qwen, OpenHands or Deepseek chats into Opencode using proxy.",
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/any-proxy",
+      "created_at": "2026-05-27T00:14:10Z",
+      "updated_at": "2026-05-27T00:27:44Z",
+      "size_kb": 60,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript",
+        "AI",
+        "LLM",
+        "proxy"
+      ],
+      "domains": [
+        "web-apps",
+        "web-automation",
+        "AI"
+      ],
+      "infrastructure": [
+        "proxy"
+      ],
+      "category": "library",
+      "summary": "Route website Claude, Qwen, OpenHands or Deepseek chats into Opencode using proxy."
+    },
+    {
+      "name": "MagicCursor",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/MagicCursor",
+      "created_at": "2025-11-02T14:42:05Z",
+      "updated_at": "2026-05-24T21:48:42Z",
+      "size_kb": 507,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript"
+      ],
+      "domains": [
+        "desktop-apps",
+        "productivity"
+      ],
+      "infrastructure": [],
+      "category": "desktop-app",
+      "summary": "TypeScript desktop application for enhanced cursor/mouse control."
+    },
+    {
+      "name": "cosmic-update",
+      "description": null,
+      "language": null,
+      "url": "https://github.com/HautlyS/cosmic-update",
+      "created_at": "2026-05-20T18:21:23Z",
+      "updated_at": "2026-05-20T18:23:26Z",
+      "size_kb": 18,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "DevOps",
+        "update-management"
+      ],
+      "domains": [
+        "devops",
+        "automation"
+      ],
+      "infrastructure": [
+        "update-management"
+      ],
+      "category": "tool",
+      "summary": "Automated update management utility."
+    },
+    {
+      "name": "coder_docky",
+      "description": null,
+      "language": "Shell",
+      "url": "https://github.com/HautlyS/coder_docky",
+      "created_at": "2026-03-31T19:12:22Z",
+      "updated_at": "2026-05-20T15:11:07Z",
+      "size_kb": 14961,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "DevOps",
+        "Docker"
+      ],
+      "domains": [
+        "devops",
+        "containerization"
+      ],
+      "infrastructure": [
+        "Docker"
+      ],
+      "category": "tool",
+      "summary": "Shell-based Docker container management for development environments."
+    },
+    {
+      "name": "portfolio",
+      "description": null,
+      "language": "HTML",
+      "url": "https://github.com/HautlyS/portfolio",
+      "created_at": "2026-03-27T22:09:44Z",
+      "updated_at": "2026-05-14T15:22:11Z",
+      "size_kb": 7215,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "HTML"
+      ],
+      "domains": [
+        "web-apps"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "Personal portfolio website showcasing projects and skills."
+    },
+    {
+      "name": "iMAGE",
+      "description": null,
+      "language": "Vue",
+      "url": "https://github.com/HautlyS/iMAGE",
+      "created_at": "2026-02-17T12:48:34Z",
+      "updated_at": "2026-05-02T15:30:31Z",
+      "size_kb": 213,
+      "stars": 1,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Vue",
+        "Vue.js",
+        "Frontend"
+      ],
+      "domains": [
+        "web-apps",
+        "media"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "Vue.js image processing and management web application."
+    },
+    {
+      "name": "qoder-bot",
+      "description": "Telegram/Whatsapp qodercli wrapper ",
+      "language": null,
+      "url": "https://github.com/HautlyS/qoder-bot",
+      "created_at": "2026-04-21T22:46:37Z",
+      "updated_at": "2026-04-21T22:46:38Z",
+      "size_kb": 0,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "AI",
+        "LLM",
+        "Telegram API",
+        "WhatsApp API"
+      ],
+      "domains": [
+        "AI",
+        "automation",
+        "messaging"
+      ],
+      "infrastructure": [
+        "Telegram API",
+        "WhatsApp API"
+      ],
+      "category": "web-app",
+      "summary": "Telegram and WhatsApp bot wrapper for qoder CLI automation."
+    },
+    {
+      "name": "mycelium",
+      "description": "Decentralized P2P Self-Replicating AI - Rust-based system with latent-space processing, federated LoRA tuning, and self-replication via spore protocol",
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/mycelium",
+      "created_at": "2026-04-10T05:00:19Z",
+      "updated_at": "2026-04-10T23:18:15Z",
+      "size_kb": 870,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust",
+        "AI",
+        "LLM",
+        "federated-learning",
+        "LoRA"
+      ],
+      "domains": [
+        "AI/ML",
+        "distributed-systems",
+        "P2P"
+      ],
+      "infrastructure": [
+        "Rust",
+        "federated-learning",
+        "LoRA"
+      ],
+      "category": "web-app",
+      "summary": "Decentralized P2P self-replicating AI system with latent-space processing, federated LoRA tuning, and self-replication via spore protocol."
+    },
+    {
+      "name": "technosutra-app",
+      "description": "TechnoSutra - Avatamsaka Sutra PWA with 3D AR",
+      "language": null,
+      "url": "https://github.com/HautlyS/technosutra-app",
+      "created_at": "2026-04-10T21:38:08Z",
+      "updated_at": "2026-04-10T21:38:36Z",
+      "size_kb": 0,
+      "stars": 0,
+      "forks": 0,
+      "topics": [
+        "3d",
+        "ar",
+        "avatamsaka",
+        "buddhism",
+        "pwa"
+      ],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "PWA",
+        "3D",
+        "AR"
+      ],
+      "domains": [
+        "web-apps",
+        "AR",
+        "3D"
+      ],
+      "infrastructure": [
+        "PWA",
+        "3D",
+        "AR"
+      ],
+      "category": "web-app",
+      "summary": "TechnoSutra - Avatamsaka Sutra PWA with 3D AR experience."
+    },
+    {
+      "name": "Gimpsky",
+      "description": null,
+      "language": "Shell",
+      "url": "https://github.com/HautlyS/Gimpsky",
+      "created_at": "2026-04-06T23:51:46Z",
+      "updated_at": "2026-04-07T00:54:16Z",
+      "size_kb": 46,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "image-processing"
+      ],
+      "infrastructure": [],
+      "category": "tool",
+      "summary": "Shell-based image processing utility (Gimp + Sky replacement)."
+    },
+    {
+      "name": "Housaky",
+      "description": "HOUSAKY PROJECT",
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Housaky",
+      "created_at": "2025-11-30T14:07:27Z",
+      "updated_at": "2026-03-25T05:05:32Z",
+      "size_kb": 61340,
+      "stars": 0,
+      "forks": 1,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "web-apps",
+        "real-estate"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "web-app",
+      "summary": "Rust-based web application for real estate/property management."
+    },
+    {
+      "name": "projects",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/projects",
+      "created_at": "2026-03-24T18:38:50Z",
+      "updated_at": "2026-03-24T20:27:12Z",
+      "size_kb": 269,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript project collection and management app."
+    },
+    {
+      "name": "test1",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/test1",
+      "created_at": "2026-02-24T03:42:20Z",
+      "updated_at": "2026-02-24T03:43:27Z",
+      "size_kb": 75185,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "general"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript test/experimentation project."
+    },
+    {
+      "name": "VKM",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/VKM",
+      "created_at": "2026-02-15T04:12:32Z",
+      "updated_at": "2026-02-19T12:47:22Z",
+      "size_kb": 70,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript web application."
+    },
+    {
+      "name": "STEM-A-PLAY",
+      "description": null,
+      "language": "Vue",
+      "url": "https://github.com/HautlyS/STEM-A-PLAY",
+      "created_at": "2026-02-15T23:12:13Z",
+      "updated_at": "2026-02-17T16:29:14Z",
+      "size_kb": 54759,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Vue",
+        "Vue.js",
+        "Frontend"
+      ],
+      "domains": [
+        "education",
+        "web-apps"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "Vue.js educational STEM platform with interactive learning modules."
+    },
+    {
+      "name": "ubuntu",
+      "description": null,
+      "language": null,
+      "url": "https://github.com/HautlyS/ubuntu",
+      "created_at": "2026-02-15T02:47:54Z",
+      "updated_at": "2026-02-15T02:47:54Z",
+      "size_kb": 0,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "general"
+      ],
+      "infrastructure": [],
+      "category": "other",
+      "summary": "Ubuntu configuration and setup project."
+    },
+    {
+      "name": "Vortex-R3D",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Vortex-R3D",
+      "created_at": "2026-01-10T08:44:12Z",
+      "updated_at": "2026-02-15T02:23:53Z",
+      "size_kb": 202347,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust",
+        "3D"
+      ],
+      "domains": [
+        "desktop-apps",
+        "multimedia"
+      ],
+      "infrastructure": [
+        "Rust",
+        "3D"
+      ],
+      "category": "desktop-app",
+      "summary": "Rust-based 3D rendering and graphics application."
+    },
+    {
+      "name": "cargo-save",
+      "description": null,
+      "language": "Makefile",
+      "url": "https://github.com/HautlyS/cargo-save",
+      "created_at": "2026-02-09T19:00:28Z",
+      "updated_at": "2026-02-14T15:28:13Z",
+      "size_kb": 240274,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust",
+        "DevOps",
+        "cargo"
+      ],
+      "domains": [
+        "devops",
+        "package-management"
+      ],
+      "infrastructure": [
+        "Rust",
+        "cargo"
+      ],
+      "category": "tool",
+      "summary": "Rust cargo extension for project save/backup workflows."
+    },
+    {
+      "name": "RNOT",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/RNOT",
+      "created_at": "2026-02-13T13:15:23Z",
+      "updated_at": "2026-02-14T13:16:42Z",
+      "size_kb": 44,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "productivity"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "tool",
+      "summary": "Rust-based note-taking and organization tool."
+    },
+    {
+      "name": "RUSSH",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/RUSSH",
+      "created_at": "2025-12-28T20:38:13Z",
+      "updated_at": "2026-02-13T18:31:56Z",
+      "size_kb": 1591,
+      "stars": 1,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "shell",
+        "productivity"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "tool",
+      "summary": "Rust shell enhancement with custom features and workflow improvements."
+    },
+    {
+      "name": "claw2",
+      "description": null,
+      "language": "Shell",
+      "url": "https://github.com/HautlyS/claw2",
+      "created_at": "2026-02-10T23:11:21Z",
+      "updated_at": "2026-02-10T23:18:42Z",
+      "size_kb": 204,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "automation"
+      ],
+      "infrastructure": [],
+      "category": "tool",
+      "summary": "Shell-based automation and scraping utility."
+    },
+    {
+      "name": "housaky-clown",
+      "description": null,
+      "language": null,
+      "url": "https://github.com/HautlyS/housaky-clown",
+      "created_at": "2026-02-10T22:53:08Z",
+      "updated_at": "2026-02-10T22:53:08Z",
+      "size_kb": 0,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "general"
+      ],
+      "infrastructure": [],
+      "category": "other",
+      "summary": "Companion/experimental project related to Housaky."
+    },
+    {
+      "name": "save-html",
+      "description": "bunch of saves for study",
+      "language": "HTML",
+      "url": "https://github.com/HautlyS/save-html",
+      "created_at": "2026-02-10T04:08:27Z",
+      "updated_at": "2026-02-10T04:48:18Z",
+      "size_kb": 36,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "AI",
+        "LLM"
+      ],
+      "domains": [
+        "AI/ML",
+        "education"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "HTML study collection for AI/ML learning resources."
+    },
+    {
+      "name": "liberali-portfolio",
+      "description": "Liberali portfolio.",
+      "language": null,
+      "url": "https://github.com/HautlyS/liberali-portfolio",
+      "created_at": "2026-02-10T03:42:22Z",
+      "updated_at": "2026-02-10T03:42:22Z",
+      "size_kb": 24618,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "web-apps"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "Liberali agency portfolio and showcase website."
+    },
+    {
+      "name": "SP-COVERAGE",
+      "description": null,
+      "language": "HTML",
+      "url": "https://github.com/HautlyS/SP-COVERAGE",
+      "created_at": "2026-02-05T23:43:12Z",
+      "updated_at": "2026-02-10T02:47:45Z",
+      "size_kb": 118354,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "AI",
+        "LLM"
+      ],
+      "domains": [
+        "AI/ML",
+        "data-analysis"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "HTML-based data coverage analysis tool for SP region."
+    },
+    {
+      "name": "Vortex-cpx",
+      "description": "Advanced iPhone media sync tool with TUI and GUI interfaces - Apple device copy/upload to GitHub with async processing",
+      "language": null,
+      "url": "https://github.com/HautlyS/Vortex-cpx",
+      "created_at": "2026-01-17T13:31:25Z",
+      "updated_at": "2026-01-17T13:31:26Z",
+      "size_kb": 0,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "async-processing"
+      ],
+      "domains": [
+        "file-management",
+        "mobile"
+      ],
+      "infrastructure": [
+        "async-processing"
+      ],
+      "category": "web-app",
+      "summary": "Advanced iPhone media sync tool with TUI and GUI interfaces for Apple device copy/upload with async processing."
+    },
+    {
+      "name": "RSCAN",
+      "description": null,
+      "language": "Makefile",
+      "url": "https://github.com/HautlyS/RSCAN",
+      "created_at": "2026-01-13T18:34:52Z",
+      "updated_at": "2026-01-13T18:59:43Z",
+      "size_kb": 233305,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "DevOps"
+      ],
+      "domains": [
+        "devops",
+        "security"
+      ],
+      "infrastructure": [],
+      "category": "tool",
+      "summary": "System scanning and analysis tool."
+    },
+    {
+      "name": "Github-Watcher",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Github-Watcher",
+      "created_at": "2026-01-10T18:22:25Z",
+      "updated_at": "2026-01-10T18:24:07Z",
+      "size_kb": 16,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust",
+        "DevOps",
+        "GitHub API"
+      ],
+      "domains": [
+        "devops",
+        "automation"
+      ],
+      "infrastructure": [
+        "GitHub API"
+      ],
+      "category": "web-app",
+      "summary": "Rust-based GitHub repository monitoring and watchlist manager."
+    },
+    {
+      "name": "Vue-Components",
+      "description": null,
+      "language": "Vue",
+      "url": "https://github.com/HautlyS/Vue-Components",
+      "created_at": "2026-01-10T18:21:00Z",
+      "updated_at": "2026-01-10T18:21:28Z",
+      "size_kb": 805,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Vue",
+        "Vue.js",
+        "Frontend"
+      ],
+      "domains": [
+        "web-apps",
+        "UI"
+      ],
+      "infrastructure": [
+        "Vue.js"
+      ],
+      "category": "web-app",
+      "summary": "Reusable Vue.js component library for rapid web development."
+    },
+    {
+      "name": "Portif-lio-Maker",
+      "description": null,
+      "language": "Vue",
+      "url": "https://github.com/HautlyS/Portif-lio-Maker",
+      "created_at": "2026-01-10T18:19:14Z",
+      "updated_at": "2026-01-10T18:19:45Z",
+      "size_kb": 200,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Vue",
+        "Vue.js",
+        "Frontend"
+      ],
+      "domains": [
+        "web-apps"
+      ],
+      "infrastructure": [
+        "Vue.js"
+      ],
+      "category": "web-app",
+      "summary": "Vue.js portfolio generator for creating personal project showcases."
+    },
+    {
+      "name": "Vortex-iMAGE",
+      "description": null,
+      "language": "Vue",
+      "url": "https://github.com/HautlyS/Vortex-iMAGE",
+      "created_at": "2025-12-21T15:40:05Z",
+      "updated_at": "2026-01-10T18:17:15Z",
+      "size_kb": 5227,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Vue",
+        "Vue.js",
+        "Frontend"
+      ],
+      "domains": [
+        "web-apps",
+        "media"
+      ],
+      "infrastructure": [
+        "Vue.js"
+      ],
+      "category": "web-app",
+      "summary": "Vue.js image management and processing tool."
+    },
+    {
+      "name": "Vortex-ROOK",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Vortex-ROOK",
+      "created_at": "2026-01-05T11:55:37Z",
+      "updated_at": "2026-01-10T18:16:54Z",
+      "size_kb": 25737,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "file-management",
+        "storage"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "app",
+      "summary": "Rust-based file storage and management system."
+    },
+    {
+      "name": "check1",
+      "description": null,
+      "language": null,
+      "url": "https://github.com/HautlyS/check1",
+      "created_at": "2025-12-21T19:25:00Z",
+      "updated_at": "2025-12-22T16:00:24Z",
+      "size_kb": 55146,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [],
+      "domains": [
+        "general"
+      ],
+      "infrastructure": [],
+      "category": "other",
+      "summary": "Testing and experimentation project."
+    },
+    {
+      "name": "Vortex",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/Vortex",
+      "created_at": "2025-12-08T14:28:19Z",
+      "updated_at": "2025-12-21T14:05:50Z",
+      "size_kb": 30099,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "file-management",
+        "media"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "app",
+      "summary": "Core Rust-based media management and processing system."
+    },
+    {
+      "name": "ECODRAW-KDE",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/ECODRAW-KDE",
+      "created_at": "2025-12-09T13:36:35Z",
+      "updated_at": "2025-12-09T13:38:21Z",
+      "size_kb": 7943,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps",
+        "education"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "KDE-integrated ecological drawing and educational tool."
+    },
+    {
+      "name": "PARALLEL",
+      "description": null,
+      "language": "Rust",
+      "url": "https://github.com/HautlyS/PARALLEL",
+      "created_at": "2025-12-04T11:19:09Z",
+      "updated_at": "2025-12-04T11:20:09Z",
+      "size_kb": 297,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "Rust"
+      ],
+      "domains": [
+        "systems",
+        "parallel-computing"
+      ],
+      "infrastructure": [
+        "Rust"
+      ],
+      "category": "tool",
+      "summary": "Rust-based parallel computing and task execution utility."
+    },
+    {
+      "name": "CHROME-HIJACK",
+      "description": null,
+      "language": "CSS",
+      "url": "https://github.com/HautlyS/CHROME-HIJACK",
+      "created_at": "2025-12-04T11:17:00Z",
+      "updated_at": "2025-12-04T11:17:33Z",
+      "size_kb": 250,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "CSS"
+      ],
+      "domains": [
+        "web-automation",
+        "browser"
+      ],
+      "infrastructure": [],
+      "category": "tool",
+      "summary": "CSS/JavaScript browser customization and UI modification project."
+    },
+    {
+      "name": "agroecologia-desenhada-ecodraw",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/agroecologia-desenhada-ecodraw",
+      "created_at": "2025-11-09T13:03:41Z",
+      "updated_at": "2025-11-09T15:46:07Z",
+      "size_kb": 868,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps",
+        "education",
+        "sustainability"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript educational drawing tool for agroecology concepts."
+    },
+    {
+      "name": "agroecologia-desenhada",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/agroecologia-desenhada",
+      "created_at": "2025-07-05T15:17:51Z",
+      "updated_at": "2025-11-02T07:20:27Z",
+      "size_kb": 1146,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript"
+      ],
+      "domains": [
+        "web-apps",
+        "education",
+        "sustainability"
+      ],
+      "infrastructure": [
+        "TypeScript"
+      ],
+      "category": "web-app",
+      "summary": "TypeScript educational platform for agroecology visual learning."
+    },
+    {
+      "name": "ecodraw",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/ecodraw",
+      "created_at": "2025-06-16T21:54:30Z",
+      "updated_at": "2025-10-28T21:33:34Z",
+      "size_kb": 1770,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript"
+      ],
+      "domains": [
+        "web-apps",
+        "education"
+      ],
+      "infrastructure": [
+        "TypeScript"
+      ],
+      "category": "web-app",
+      "summary": "TypeScript drawing and visualization educational tool."
+    },
+    {
+      "name": "mouse-spark",
+      "description": null,
+      "language": "JavaScript",
+      "url": "https://github.com/HautlyS/mouse-spark",
+      "created_at": "2025-08-17T14:53:33Z",
+      "updated_at": "2025-08-17T14:53:55Z",
+      "size_kb": 46,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "JavaScript"
+      ],
+      "domains": [
+        "web-apps",
+        "UI"
+      ],
+      "infrastructure": [],
+      "category": "web-app",
+      "summary": "JavaScript mouse trail and sparkle effect library."
+    },
+    {
+      "name": "circo-natureza-digital-showcase",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/circo-natureza-digital-showcase",
+      "created_at": "2025-07-19T00:38:49Z",
+      "updated_at": "2025-07-19T00:41:38Z",
+      "size_kb": 770,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript"
+      ],
+      "domains": [
+        "web-apps",
+        "education",
+        "sustainability"
+      ],
+      "infrastructure": [
+        "TypeScript"
+      ],
+      "category": "web-app",
+      "summary": "TypeScript showcase for Circus of Digital Nature - digital nature exhibition."
+    },
+    {
+      "name": "dharma-ar-mandala-sutra",
+      "description": null,
+      "language": "TypeScript",
+      "url": "https://github.com/HautlyS/dharma-ar-mandala-sutra",
+      "created_at": "2025-06-16T21:50:50Z",
+      "updated_at": "2025-06-21T22:07:00Z",
+      "size_kb": 3222,
+      "stars": 0,
+      "forks": 0,
+      "topics": [],
+      "is_fork": false,
+      "tech_stack_inferred": [
+        "TypeScript",
+        "AR"
+      ],
+      "domains": [
+        "web-apps",
+        "AR",
+        "spirituality"
+      ],
+      "infrastructure": [
+        "AR",
+        "TypeScript"
+      ],
+      "category": "web-app",
+      "summary": "TypeScript AR mandala sutra experience combining dharma and digital art."
+    }
+  ],
+  "skills_summary": {
+    "languages": {
+      "Rust": 10,
+      "JavaScript": 8,
+      "TypeScript": 7,
+      "Vue": 5
+    },
+    "tech_stack": [
+      "3D",
+      "AI",
+      "AR",
+      "CI/CD",
+      "CSS",
+      "DevOps",
+      "Docker",
+      "Frontend",
+      "GitHub API",
+      "HTML",
+      "JavaScript",
+      "LLM",
+      "LoRA",
+      "PWA",
+      "Rust",
+      "Rust CLI",
+      "Telegram API",
+      "TypeScript",
+      "Vue",
+      "Vue.js",
+      "WhatsApp API",
+      "async-processing",
+      "cargo",
+      "federated-learning",
+      "proxy",
+      "update-management"
+    ],
+    "domains": [
+      "3D",
+      "AI",
+      "AI/ML",
+      "AR",
+      "P2P",
+      "UI",
+      "automation",
+      "browser",
+      "containerization",
+      "data-analysis",
+      "data-storage",
+      "desktop-apps",
+      "devops",
+      "distributed-systems",
+      "education",
+      "environmental",
+      "file-management",
+      "geospatial",
+      "image-processing",
+      "media",
+      "messaging",
+      "mobile",
+      "multimedia",
+      "package-management",
+      "parallel-computing",
+      "productivity",
+      "real-estate",
+      "security",
+      "shell",
+      "spirituality",
+      "storage",
+      "sustainability",
+      "systems",
+      "web-apps",
+      "web-automation"
+    ],
+    "infrastructure": [
+      "3D",
+      "AR",
+      "CI/CD",
+      "Docker",
+      "GitHub API",
+      "LoRA",
+      "PWA",
+      "Rust",
+      "Rust CLI",
+      "Telegram API",
+      "TypeScript",
+      "Vue.js",
+      "WhatsApp API",
+      "async-processing",
+      "cargo",
+      "federated-learning",
+      "proxy",
+      "update-management"
+    ]
+  },
+  "enriched_at": "2026-07-27"
+}

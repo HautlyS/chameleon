@@ -1,0 +1,95 @@
+version: "3.8"
+
+services:
+  ## Chameleon bot bridge — orchestrates Telegram + WhatsApp + RSS
+  bridge:
+    build:
+      context: ..
+      dockerfile: chameleon-bot/Dockerfile.bridge
+    container_name: chameleon-bridge
+    env_file: .env
+    volumes:
+      - ../.chameleon:/app/.chameleon
+      - ../output:/app/output
+      - ../templates:/app/templates
+      - ../profiles:/app/profiles
+    restart: unless-stopped
+    command: ["--rss"]
+
+  ## Telegram bot
+  telegram-bot:
+    build:
+      context: ./opencode-telegram-bot
+      dockerfile: Dockerfile
+    container_name: chameleon-telegram
+    env_file: .env
+    volumes:
+      - ../.chameleon:/data/.chameleon
+      - ../output:/data/output
+      - ../templates:/data/templates
+    ports:
+      - "4096:4096"
+    restart: unless-stopped
+    depends_on:
+      - bridge
+
+  ## WhatsApp webhook receiver
+  whatsapp-bot:
+    build:
+      context: ..
+      dockerfile: chameleon-bot/whatsapp-bot/Dockerfile
+    container_name: chameleon-whatsapp
+    env_file:
+      - .env
+      - whatsapp-bot/.env
+    volumes:
+      - ../.chameleon:/app/.chameleon
+      - ../output:/app/output
+      - ../templates:/app/templates
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    depends_on:
+      - bridge
+
+  ## Evolution API (WhatsApp transport)
+  evolution-api:
+    image: evolutionapi/evolution-api:latest
+    container_name: chameleon-evolution
+    env_file: .env.evolution
+    ports:
+      - "8080:8080"
+    volumes:
+      - evolution_data:/evolution/instances
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - postgres
+
+  ## Redis (for Evolution API)
+  redis:
+    image: redis:7-alpine
+    container_name: chameleon-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  ## PostgreSQL (for Evolution API)
+  postgres:
+    image: postgres:16-alpine
+    container_name: chameleon-postgres
+    environment:
+      POSTGRES_USER: chameleon
+      POSTGRES_PASSWORD: chameleon_secret
+      POSTGRES_DB: evolution
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  evolution_data:
+  postgres_data:

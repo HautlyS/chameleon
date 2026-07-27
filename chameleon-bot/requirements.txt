@@ -1,0 +1,3 @@
+# Chameleon Bridge dependencies
+# Core chameleon dependencies (from project root)
+# The bridge itself is pure Python stdlib — no extra deps
