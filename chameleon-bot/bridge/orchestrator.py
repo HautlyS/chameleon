@@ -133,7 +133,7 @@ class BotOrchestrator:
                 if self.whatsapp:
                     self.whatsapp.send_message(num, notify_msg.replace("*", ""))
 
-            pdf_path = self._find_rendered_pdf(analysis)
+            pdf_path = Path(result["pdf_path"]) if result.get("pdf_path") else None
             if pdf_path:
                 if self.telegram:
                     self.telegram.send_document(str(pdf_path), caption=f"CV for {analysis.get('role_title', '?')} at {analysis.get('company_name', '?')}")
@@ -149,14 +149,6 @@ class BotOrchestrator:
                     self.whatsapp.send_error(num, msg)
 
         return result
-
-    def _find_rendered_pdf(self, analysis: dict[str, Any]) -> Path | None:
-        """Find the most recently rendered PDF for this analysis."""
-        output_dir = self.config.output_dir
-        if not output_dir.exists():
-            return None
-        pdfs = sorted(output_dir.glob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True)
-        return pdfs[0] if pdfs else None
 
     def send_notification(self, text: str) -> None:
         if self.telegram:

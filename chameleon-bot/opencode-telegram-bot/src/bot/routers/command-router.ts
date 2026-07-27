@@ -153,7 +153,7 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
         const lines = jobs.slice(0, 5).map((j) =>
           `• ${j.title} @ ${j.company}\n  ${j.url || ""}`
         );
-        await ctx.reply(`Found ${jobs.length} jobs:\n\n${lines.join("\n\n")}`, { disable_web_page_preview: true });
+        await ctx.reply(`Found ${jobs.length} jobs:\n\n${lines.join("\n\n")}`, { link_preview_options: { is_disabled: true } });
       }
     } else {
       await chameleonCommandHandler(ctx, chameleonCtx);
@@ -249,12 +249,12 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
     const parts = text.replace(/^\/review\s*/i, "").trim().split(/\s+/);
     const yamlPath = parts[0] || "";
     if (!yamlPath || parts.length < 2) {
-      await ctx.reply("Usage: /review <yaml_path> <jd_file>");
+      await ctx.reply("Usage: /review <yaml_path> <jd_text>");
       return;
     }
-    const jdFile = parts[1];
+    const jdText = parts.slice(1).join(" ");
     await ctx.reply("Running double AI review...");
-    const result = bridge.reviewCv(yamlPath, jdFile);
+    const result = bridge.reviewCv(yamlPath, jdText);
     if (result.success) {
       const data = result.data as Record<string, unknown> || {};
       const review = data.review as Record<string, unknown> || {};

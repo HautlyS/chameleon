@@ -14,6 +14,7 @@ from .chameleon_client import ChameleonClient
 
 
 class RssScanner:
+    MAX_SEEN_IDS = 10_000
     def __init__(
         self,
         config: BridgeConfig,
@@ -28,6 +29,7 @@ class RssScanner:
         self._thread: threading.Thread | None = None
         self._seen_file = config.project_root / ".chameleon" / "rss_seen.json"
         self._seen_ids: set[str] = set()
+        self._stop_event = threading.Event()
         self._load_seen()
 
     def _load_seen(self):
@@ -40,8 +42,12 @@ class RssScanner:
 
     def _save_seen(self):
         self._seen_file.parent.mkdir(parents=True, exist_ok=True)
+        # Retaining every historical ID makes this state grow forever. The
+        # scanner only needs a bounded recent window for de-duplication.
+        seen_ids = sorted(self._seen_ids)[-self.MAX_SEEN_IDS:]
+        self._seen_ids = set(seen_ids)
         self._seen_file.write_text(json.dumps({
-            "seen_ids": list(self._seen_ids),
+            "seen_ids": seen_ids,
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }))
 
@@ -99,17 +105,19 @@ class RssScanner:
             except Exception:
                 import traceback
                 pass
-            time.sleep(self.config.rss_interval_minutes * 60)
+            self._stop_event.wait(self.config.rss_interval_minutes * 60)
 
     def start(self):
         if self._running:
             return
         self._running = True
+        self._stop_event.clear()
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
 
     def stop(self):
         self._running = False
+        self._stop_event.set()
         if self._thread:
             self._thread.join(timeout=10)
             self._thread = None

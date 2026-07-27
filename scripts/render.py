@@ -57,7 +57,10 @@ def render_yaml(yaml_path: Path) -> tuple[bool, str]:
         result = subprocess.run(
             [
                 str(rendercv), "render", str(tmp),
-                "--output-folder", str(output_dir),
+                "--pdf-path", str(output_dir / f"{stem}.pdf"),
+                "--typst-path", str(output_dir / f"{stem}.typ"),
+                "--markdown-path", str(output_dir / f"{stem}.md"),
+                "--html-path", str(output_dir / f"{stem}.html"),
             ],
             check=False,
             capture_output=True,
@@ -80,10 +83,7 @@ def render_yaml(yaml_path: Path) -> tuple[bool, str]:
 
 
 def _find_output_pdf(output_dir: Path, stem: str) -> str | None:
-    """Find the rendered PDF, which may be renamed to match the CV name field."""
-    for f in sorted(output_dir.iterdir()):
-        if f.suffix == ".pdf":
-            return str(f)
+    """Return only the deterministic artifact for this render invocation."""
     pdf_path = output_dir / f"{stem}.pdf"
     return str(pdf_path) if pdf_path.exists() else None
 

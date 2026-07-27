@@ -13,6 +13,7 @@ import hashlib
 import json
 import re
 import shutil
+import argparse
 import subprocess
 import sys
 import threading
@@ -654,50 +655,22 @@ def tailor_and_render(
 
 
 def main():
-    if len(sys.argv) < 2:
-        # Check for piped stdin
-        if not sys.stdin.isatty():
-            desc = sys.stdin.read().strip()
-            if desc:
-                ok, msg, path = tailor_and_render(desc)
-                print(msg)
-                sys.exit(0 if ok else 1)
-        print("Usage: tailor_cv.py <jd_text_or_file_or_url> [--company X] [--title Y] [--no-review] [--no-render] [--json]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Tailor a CV from job-description text, a file, or a job-posting URL."
+    )
+    parser.add_argument("jd", nargs="?", help="Job description text, path, or URL")
+    parser.add_argument("--company", default="", help="Company name override")
+    parser.add_argument("--title", default="", help="Role title override")
+    parser.add_argument("--no-review", action="store_true", help="Skip AI review")
+    parser.add_argument("--no-render", action="store_true", help="Skip PDF rendering")
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable output")
+    parsed = parser.parse_args()
 
-    args = sys.argv[1:]
-    company = ""
-    title = ""
-    skip_review = False
-    skip_render = False
-    as_json = False
-    jd_arg = ""
-
-    i = 0
-    while i < len(args):
-        if args[i] == "--company" and i + 1 < len(args):
-            company = args[i + 1]
-            i += 2
-        elif args[i] == "--title" and i + 1 < len(args):
-            title = args[i + 1]
-            i += 2
-        elif args[i] == "--no-review":
-            skip_review = True
-            i += 1
-        elif args[i] == "--no-render":
-            skip_render = True
-            i += 1
-        elif args[i] == "--json":
-            as_json = True
-            i += 1
-        else:
-            if not jd_arg:
-                jd_arg = args[i]
-            i += 1
-
+    jd_arg = parsed.jd
+    if not jd_arg and not sys.stdin.isatty():
+        jd_arg = sys.stdin.read().strip()
     if not jd_arg:
-        print("Error: no job description text, file, or URL provided")
-        sys.exit(1)
+        parser.error("a job description text, file, or URL is required")
 
     # Handle URL input
     if jd_arg.startswith("http://") or jd_arg.startswith("https://"):
@@ -746,13 +719,18 @@ def main():
 
     ok, msg, output_path = tailor_and_render(
         desc,
-        company=company,
-        title=title,
-        skip_review=skip_review,
-        skip_render=skip_render,
+        company=parsed.company,
+        title=parsed.title,
+        skip_review=parsed.no_review,
+        skip_render=parsed.no_render,
     )
 
-    if as_json:
+    if not parsed.json:
+        # Keep CLI output portable on Windows consoles configured for cp1252.
+        print(f"\n{'PASS' if ok else 'FAIL'}: {msg}")
+        sys.exit(0 if ok else 1)
+
+    if parsed.json:
         import json as _json
         print(_json.dumps({
             "success": ok,

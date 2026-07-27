@@ -77,13 +77,16 @@ def extract_jd_sections(jd_text: str) -> dict:
     lower = jd_text.lower()
     sections: dict[str, str] = {"full_text": jd_text}
     # Common section headers in JDs
+    # Headers frequently have content on the same line (for example,
+    # ``Requirements: Python, Docker``), so do not require a second newline.
+    # Keep matches anchored to line starts to avoid classifying prose as a section.
     patterns = [
-        (r"(about|overview|who we are)[:\s]*\n", "about"),
-        (r"(requirements|what you need|qualifications|skills)[:\s]*\n", "requirements"),
-        (r"(responsibilities|what you.ll do|role|key duties)[:\s]*\n", "responsibilities"),
-        (r"(nice to have|bonus|preferred|plus)[:\s]*\n", "bonus"),
-        (r"(benefits|what we offer|perks)[:\s]*\n", "benefits"),
-        (r"(about the company|our company|the company)[:\s]*\n", "company_about"),
+        (r"(?im)^[ \t]*(about the company|our company|the company)\s*:?[ \t]*", "company_about"),
+        (r"(?im)^[ \t]*(requirements|what you need|qualifications|skills)\s*:?[ \t]*", "requirements"),
+        (r"(?im)^[ \t]*(responsibilities|what you.?ll do|role|key duties)\s*:?[ \t]*", "responsibilities"),
+        (r"(?im)^[ \t]*(nice to have|bonus|preferred|plus)\s*:?[ \t]*", "bonus"),
+        (r"(?im)^[ \t]*(benefits|what we offer|perks)\s*:?[ \t]*", "benefits"),
+        (r"(?im)^[ \t]*(about|overview|who we are)\s*:?[ \t]*", "about"),
     ]
     for pat, key in patterns:
         m = re.search(pat, lower)

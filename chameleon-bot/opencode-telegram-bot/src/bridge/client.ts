@@ -1,5 +1,5 @@
-import { execSync, type ExecSyncOptions } from "child_process";
-import { existsSync, mkdirSync, writeFileSync, unlinkSync } from "fs";
+import { execFileSync, execSync, type ExecFileSyncOptions } from "child_process";
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, readdirSync, statSync } from "fs";
 import { fileURLToPath } from "url";
 import { resolve, dirname } from "path";
 import { logger } from "../utils/logger.js";
@@ -25,9 +25,20 @@ class BridgeClient {
     this.bridgeDir = resolve(projectRoot, "chameleon-bot");
     this.tempDir = resolve(projectRoot, ".chameleon");
 
+    // Clean temp files older than 24h at startup
+    try {
+      if (existsSync(this.tempDir)) {
+        const now = Date.now();
+        for (const f of readdirSync(this.tempDir)) {
+          const fp = resolve(this.tempDir, f);
+          try { if (now - statSync(fp).mtimeMs > 86_400_000) unlinkSync(fp); } catch { /* ignore */ }
+        }
+      }
+    } catch { /* ignore */ }
+
     const pythonFromEnv = process.env.CHAMELEON_PYTHON;
     if (pythonFromEnv) {
-      this.pythonBin = resolve(pythonFromEnv);
+      this.pythonBin = pythonFromEnv;
     } else {
       const candidates = ["python3", "python", "python.exe", "python3.exe"];
       const found = candidates.find((name) => {
@@ -51,15 +62,14 @@ class BridgeClient {
     if (!existsSync(this.bridgeDir)) {
       return { success: false, error: `Bridge not found: ${this.bridgeDir}` };
     }
-    const cmd = [this.pythonBin, "-m", "bridge", ...args].join(" ");
-    const opts: ExecSyncOptions = {
+    const opts: ExecFileSyncOptions = {
       cwd: this.bridgeDir,
       encoding: "utf-8",
       maxBuffer: 10 * 1024 * 1024,
       timeout: timeoutMs,
     };
     try {
-      const out = String(execSync(cmd, opts)).trim();
+      const out = String(execFileSync(this.pythonBin, ["-m", "bridge", ...args], opts)).trim();
       try { return { success: true, data: JSON.parse(out) }; }
       catch { return { success: true, data: out }; }
     } catch (err: unknown) {
@@ -89,17 +99,32 @@ class BridgeClient {
     return this.run(["render", "--yaml", yamlPath], 60000);
   }
 
-  ghostPdf(pdfPath: string, jdFile?: string, extraTerms?: string): BridgeResult {
+  ghostPdf(pdfPath: string, jdText?: string, extraTerms?: string): BridgeResult {
     const args = ["ghost", "--yaml", pdfPath, "--json"];
-    if (jdFile) args.push("--jd", jdFile);
+    let jdPath: string | undefined;
+    if (jdText) {
+      jdPath = this.tempFile("ghost_jd", jdText);
+      args.push("--jd", jdPath);
+    }
     if (extraTerms) args.push("--extra", extraTerms);
-    return this.run(args, 60000);
+    try {
+      return this.run(args, 60000);
+    } finally {
+      if (jdPath) {
+        try { unlinkSync(jdPath); } catch { /* ignore */ }
+      }
+    }
   }
 
-  reviewCv(yamlPath: string, jdFile: string, single = false): BridgeResult {
-    const args = ["review", "--yaml", yamlPath, "--jd", jdFile, "--json"];
-    if (single) args.push("--single");
-    return this.run(args, 180000);
+  reviewCv(yamlPath: string, jdText: string, single = false): BridgeResult {
+    const jdPath = this.tempFile("review_jd", jdText);
+    try {
+      const args = ["review", "--yaml", yamlPath, "--jd", jdPath, "--json"];
+      if (single) args.push("--single");
+      return this.run(args, 180000);
+    } finally {
+      try { unlinkSync(jdPath); } catch { /* ignore */ }
+    }
   }
 
   tailorCv(jdText: string, company?: string, title?: string): BridgeResult {
@@ -127,16 +152,20 @@ class BridgeClient {
 
   answerQuestion(questionText: string, jdText?: string, cvPath?: string): BridgeResult {
     const qPath = this.tempFile("q", questionText);
+    let jdPath: string | undefined;
     try {
       const args = ["question", "--yaml", qPath, "--json"];
       if (jdText) {
-        const jdPath = this.tempFile("q_jd", jdText);
+        jdPath = this.tempFile("q_jd", jdText);
         args.push("--jd", jdPath);
       }
       if (cvPath) args.push("--cv", cvPath);
       return this.run(args, 120000);
     } finally {
       try { unlinkSync(qPath); } catch { /* ignore */ }
+      if (jdPath) {
+        try { unlinkSync(jdPath); } catch { /* ignore */ }
+      }
     }
   }
 

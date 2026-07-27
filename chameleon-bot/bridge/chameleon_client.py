@@ -13,7 +13,9 @@ class ChameleonClient:
         self.root = Path(project_root).resolve()
         sys.path.insert(0, str(self.root))
 
-    def _run_script(self, module: str, args: list[str] | None = None) -> subprocess.CompletedProcess:
+    def _run_script(
+        self, module: str, args: list[str] | None = None, timeout: int = 120
+    ) -> subprocess.CompletedProcess:
         cmd = [sys.executable, "-m", module]
         if args:
             cmd.extend(args)
@@ -22,7 +24,7 @@ class ChameleonClient:
             cwd=self.root,
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=timeout,
         )
 
     def scan_jobs(
@@ -141,9 +143,16 @@ class ChameleonClient:
             if skip_render:
                 args.append("--no-render")
 
-            result = self._run_script("scripts.tailor_cv", args)
+            # A complete tailor run can include retries, two AI reviews, and a
+            # PDF render; the generic two-minute bridge timeout is insufficient.
+            result = self._run_script("scripts.tailor_cv", args, timeout=900)
             if result.returncode == 0:
-                return {"success": True, "output": result.stdout.strip()}
+                output = result.stdout.strip()
+                pdf_path = ""
+                for line in output.splitlines():
+                    if line.strip().startswith("PDF:"):
+                        pdf_path = line.split(":", 1)[1].strip()
+                return {"success": True, "output": output, "pdf_path": pdf_path}
             return {"success": False, "error": result.stderr.strip() or result.stdout.strip()}
         finally:
             Path(jd_path).unlink(missing_ok=True)

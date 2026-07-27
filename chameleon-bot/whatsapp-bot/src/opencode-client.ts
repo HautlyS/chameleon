@@ -138,11 +138,15 @@ export async function abortSession(config: OpenCodeConfig): Promise<void> {
   }
 }
 
-export async function checkHealth(config: OpenCodeConfig): Promise<boolean> {
+export async function checkHealth(config: OpenCodeConfig, timeoutMs = 5000): Promise<boolean> {
   try {
     const client = await getClient(config);
-    const resp = await client.global.health();
-    return resp.healthy;
+    const result = await Promise.race([
+      client.global.health(),
+      new Promise<"timeout">((r) => setTimeout(() => r("timeout"), timeoutMs)),
+    ]);
+    if (result === "timeout") return false;
+    return result.healthy;
   } catch {
     return false;
   }

@@ -1,4 +1,4 @@
-import { execSync, type ExecSyncOptions } from "child_process";
+import { execFileSync, execSync, type ExecFileSyncOptions } from "child_process";
 import { existsSync, mkdirSync, writeFileSync, unlinkSync } from "fs";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
@@ -16,7 +16,7 @@ export function getBridgeConfig(): BridgeConfig {
   let pythonBin: string;
 
   if (pythonFromEnv) {
-    pythonBin = resolve(__dirname, pythonFromEnv);
+    pythonBin = pythonFromEnv;
   } else {
     const candidates = ["python3", "python", "python.exe", "python3.exe"];
     const found = candidates.find((name) => {
@@ -41,8 +41,7 @@ function runBridge(args: string[], timeoutMs: number = 60000, config?: Partial<B
     return JSON.stringify({ error: `Bridge directory not found: ${bridgeDir}` });
   }
 
-  const cmd = [cfg.pythonBin, "-m", "bridge", ...args].join(" ");
-  const opts: ExecSyncOptions = {
+  const opts: ExecFileSyncOptions = {
     cwd: bridgeDir,
     encoding: "utf-8",
     maxBuffer: 10 * 1024 * 1024,
@@ -50,7 +49,7 @@ function runBridge(args: string[], timeoutMs: number = 60000, config?: Partial<B
   };
 
   try {
-    return execSync(cmd, opts).trim();
+    return String(execFileSync(cfg.pythonBin, ["-m", "bridge", ...args], opts)).trim();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return JSON.stringify({ error: `Bridge exec failed: ${msg}` });
@@ -131,16 +130,20 @@ export function answerQuestion(
   config?: Partial<BridgeConfig>,
 ): string {
   const qPath = tempFile("q", questionText);
+  let jdPath: string | undefined;
   try {
     const args = ["question", "--yaml", qPath, "--json"];
     if (jdText) {
-      const jdPath = tempFile("q_jd", jdText);
+      jdPath = tempFile("q_jd", jdText);
       args.push("--jd", jdPath);
     }
     if (cvPath) args.push("--cv", cvPath);
     return runBridge(args, 120000, config);
   } finally {
     try { unlinkSync(qPath); } catch {}
+    if (jdPath) {
+      try { unlinkSync(jdPath); } catch {}
+    }
   }
 }
 
@@ -158,13 +161,20 @@ export function ghostPdf(
   extraTerms?: string,
   config?: Partial<BridgeConfig>,
 ): string {
+  let jdPath: string | undefined;
   const args = ["ghost", "--yaml", pdfPath, "--json"];
   if (jdText) {
-    const jdPath = tempFile("ghost_jd", jdText);
+    jdPath = tempFile("ghost_jd", jdText);
     args.push("--jd", jdPath);
   }
   if (extraTerms) args.push("--extra", extraTerms);
-  return runBridge(args, 60000, config);
+  try {
+    return runBridge(args, 60000, config);
+  } finally {
+    if (jdPath) {
+      try { unlinkSync(jdPath); } catch {}
+    }
+  }
 }
 
 export function reviewCv(
@@ -176,7 +186,11 @@ export function reviewCv(
   const jdPath = tempFile("review_jd", jdText);
   const args = ["review", "--yaml", yamlPath, "--jd", jdPath, "--json"];
   if (single) args.push("--single");
-  return runBridge(args, 180000, config);
+  try {
+    return runBridge(args, 180000, config);
+  } finally {
+    try { unlinkSync(jdPath); } catch {}
+  }
 }
 
 export function subscribeWhatsApp(phoneNumber: string, config?: Partial<BridgeConfig>): string {

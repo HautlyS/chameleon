@@ -6,6 +6,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 dotenv.config({ path: resolve(__dirname, "../.env") });
 
 import express from "express";
+import { timingSafeEqual } from "crypto";
 import {
   scanJobs,
   listAnalyses,
@@ -21,7 +22,7 @@ import {
   unsubscribeWhatsApp,
 } from "./bridge.js";
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync, statSync } from "fs";
 
 import {
   sendButtonMenu,
@@ -48,7 +49,32 @@ import {
 } from "./opencode-client.js";
 
 const PORT = parseInt(process.env.PORT || "3001", 10);
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "secret";
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET?.trim();
+const ALLOWED_SENDERS = new Set(
+  (process.env.WHATSAPP_ALLOWED_NUMBERS || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean),
+);
+
+if (!WEBHOOK_SECRET || WEBHOOK_SECRET === "secret" || WEBHOOK_SECRET === "change-me-to-a-random-string") {
+  throw new Error("WEBHOOK_SECRET must be set to a unique, non-default value.");
+}
+if (ALLOWED_SENDERS.size === 0) {
+  throw new Error("WHATSAPP_ALLOWED_NUMBERS must list at least one authorized WhatsApp JID or number.");
+}
+
+function hasValidWebhookSecret(value: string | string[] | undefined): boolean {
+  if (typeof value !== "string") return false;
+  const received = Buffer.from(value);
+  const expected = Buffer.from(WEBHOOK_SECRET);
+  return received.length === expected.length && timingSafeEqual(received, expected);
+}
+
+function isAllowedSender(jid: string): boolean {
+  const number = jid.split("@", 1)[0];
+  return ALLOWED_SENDERS.has(jid) || ALLOWED_SENDERS.has(number);
+}
 
 // ── Dual-mode control ────────────────────────────────────────────────
 // OC_ENABLED=false → bridge-only mode (no SDK import attempted)
@@ -103,6 +129,46 @@ function getMenuConfig(): MenuConfig {
   };
 }
 
+// ── Health check caching ────────────────────────────────────────────
+let lastHealthCheck = 0;
+const HEALTH_CACHE_TTL = 30_000; // 30s
+
+async function ensureOcReady(): Promise<boolean> {
+  if (!OC_ENABLED || !ocConfig) return false;
+  const now = Date.now();
+  if (now - lastHealthCheck < HEALTH_CACHE_TTL) return ocReady;
+  const healthy = await checkHealth(ocConfig);
+  ocReady = healthy;
+  lastHealthCheck = now;
+  return healthy;
+}
+
+// ── Webhook deduplication ──────────────────────────────────────────
+const processedMessageIds = new Set<string>();
+const DEDUP_CLEANUP_INTERVAL = 60_000;
+
+setInterval(() => {
+  if (processedMessageIds.size > 10000) processedMessageIds.clear();
+}, DEDUP_CLEANUP_INTERVAL);
+
+// ── Temp file cleanup ──────────────────────────────────────────────
+const CLEANUP_DIR = resolve(__dirname, "../../.chameleon");
+
+function cleanTempFiles(maxAgeMs = 86_400_000): void {
+  try {
+    if (!existsSync(CLEANUP_DIR)) return;
+    const now = Date.now();
+    for (const f of readdirSync(CLEANUP_DIR)) {
+      const fp = resolve(CLEANUP_DIR, f);
+      try { if (now - statSync(fp).mtimeMs > maxAgeMs) unlinkSync(fp); } catch { /* ignore */ }
+    }
+  } catch { /* ignore */ }
+}
+
+// Run once at startup, then hourly
+cleanTempFiles();
+setInterval(() => cleanTempFiles(), 3_600_000);
+
 // ── SSE Event State ──────────────────────────────────────────────────
 
 const responseBuffers = new Map<string, string>();
@@ -144,13 +210,37 @@ function handleOpenCodeEvent(event: Record<string, unknown>): void {
   }
 }
 
-// ── Dynamic OpenCode health check ───────────────────────────────────
+// ── Module-level route helpers ───────────────────────────────────────
 
-async function ensureOcReady(): Promise<boolean> {
-  if (!OC_ENABLED || !ocConfig) return false;
-  const healthy = await checkHealth(ocConfig);
-  ocReady = healthy;
-  return healthy;
+async function routeToOc(sender: string, text: string): Promise<void> {
+  const hasOc = OC_ENABLED && ocConfig;
+  if (!hasOc || !await ensureOcReady()) {
+    await sendWhatsAppMessage(sender, "OpenCode is not available. Type /mode to switch back to bridge-first.");
+    return;
+  }
+  if (isBusy()) {
+    await sendWhatsAppMessage(sender, "Still working on the previous task. Send /abort to stop it, or wait.");
+    return;
+  }
+  try {
+    await sendPrompt(ocConfig!, text);
+    markBusy();
+    await sendWhatsAppMessage(sender, "Processing...");
+    const reply = await waitForResponse(180_000);
+    const chunks = splitMessage(reply || "(No response)", 4000);
+    for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+  } catch (err) {
+    markIdle();
+    await sendWhatsAppMessage(sender, `OpenCode error: ${err}`);
+  }
+}
+
+function tryOcFirst(sender: string, text: string): boolean {
+  if (preferOc(sender) && OC_ENABLED && ocConfig) {
+    routeToOc(sender, text);
+    return true;
+  }
+  return false;
 }
 
 // ── Express App ──────────────────────────────────────────────────────
@@ -170,7 +260,7 @@ app.get("/health", async (_req, res) => {
 
 app.post("/webhook/evolution", async (req, res) => {
   const auth = req.headers["x-webhook-secret"];
-  if (auth !== WEBHOOK_SECRET) {
+  if (!hasValidWebhookSecret(auth)) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -200,7 +290,14 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   const fromMe = key?.fromMe as boolean | undefined;
   const remoteJid = key?.remoteJid as string | undefined;
 
-  if (fromMe || !remoteJid || remoteJid === "status@broadcast") return;
+  if (fromMe || !remoteJid || remoteJid === "status@broadcast" || !isAllowedSender(remoteJid)) return;
+
+  // Deduplicate: skip if we've already processed this message ID
+  const msgId = key?.id as string | undefined;
+  if (msgId) {
+    if (processedMessageIds.has(msgId)) return;
+    processedMessageIds.add(msgId);
+  }
 
   const message = data.message as Record<string, unknown> | undefined;
   if (!message) return;
@@ -251,11 +348,10 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       "Tip: some WhatsApp clients also support interactive buttons below ⬇️",
     ]));
 
-    // Try interactive menus in parallel (best-effort)
+    // Try interactive menus (best-effort, errors are swallowed by send*Menu)
     const mc = getMenuConfig();
-    await sendListMenu(sender, "Chameleon Bot", "Choose an action:", "Commands", mainMenuAsListSections(), mc)
-      .catch(() => sendButtonMenu(sender, "Chameleon Bot", "Choose:", mainMenuAsButtons(), mc))
-      .catch(() => { /* fallback already handled by text menu above */ });
+    const listOk = await sendListMenu(sender, "Chameleon Bot", "Choose an action:", "Commands", mainMenuAsListSections(), mc);
+    if (!listOk) { sendButtonMenu(sender, "Chameleon Bot", "Choose:", mainMenuAsButtons(), mc); }
 
     return;
   }
@@ -307,7 +403,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower === "/status") {
-    const healthy = hasOc ? await checkHealth(ocConfig) : false;
+    const healthy = OC_ENABLED && ocConfig ? await ensureOcReady() : false;
     const session = getSession();
     await sendWhatsAppMessage(sender, [
       `Routing: ${getModeLabel(sender)}`,
@@ -318,41 +414,9 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
     return;
   }
 
-  // ── Helper: send to OC (reused by bridge commands in OC-first mode)
-  async function routeToOc(text: string): Promise<void> {
-    if (!hasOc || !await ensureOcReady()) {
-      await sendWhatsAppMessage(sender, "OpenCode is not available. Type /mode to switch back to bridge-first.");
-      return;
-    }
-    if (isBusy()) {
-      await sendWhatsAppMessage(sender, "Still working on the previous task. Send /abort to stop it, or wait.");
-      return;
-    }
-    try {
-      await sendPrompt(ocConfig, text);
-      markBusy();
-      await sendWhatsAppMessage(sender, "Processing...");
-      const reply = await waitForResponse(180_000);
-      const chunks = splitMessage(reply || "(No response)", 4000);
-      for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
-    } catch (err) {
-      markIdle();
-      await sendWhatsAppMessage(sender, `OpenCode error: ${err}`);
-    }
-  }
-
-  // ── Helper: OC-first early return ─────────────────────────────────
-  function tryOcFirst(): boolean {
-    if (preferOc(sender) && hasOc) {
-      routeToOc(text);
-      return true;
-    }
-    return false;
-  }
-
   // ── Bridge commands (respect mode toggle) ─────────────────────────
   if (lower.startsWith("/scan")) {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     const query = text.replace(/^\/scan\s*/i, "").trim();
     await sendWhatsAppMessage(sender, "Scanning jobs...");
     try {
@@ -371,7 +435,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower === "/analyses") {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     try {
       const result = listAnalyses();
       const analyses = JSON.parse(result) as Array<Record<string, unknown>>;
@@ -388,7 +452,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower === "/cvs") {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     try {
       const result = listTailoredCvs();
       const cvs = JSON.parse(result) as Array<Record<string, unknown>>;
@@ -405,7 +469,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower.startsWith("/render")) {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     const yamlPath = text.replace(/^\/render\s*/i, "").trim();
     if (!yamlPath) {
       await sendWhatsAppMessage(sender, "Usage: /render <yaml_path>");
@@ -432,7 +496,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
 
   // ── Chameleon AI commands (bridge-first, fall back to OpenCode) ─────
   if (lower.startsWith("/chameleon")) {
-    if (preferOc(sender) && hasOc) { await routeToOc(text); return; }
+    if (tryOcFirst(sender, text)) return;
     await sendWhatsAppMessage(sender, "Running full tailor workflow...");
     try {
       const args = text.replace(/^\/chameleon\s*/i, "").trim();
@@ -442,9 +506,9 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       if (parsed.success) {
         const chunks = splitMessage(parsed.output as string || "CV tailored successfully.", 4000);
         for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
-      } else if (hasOc && await ensureOcReady()) {
+      } else if (OC_ENABLED && ocConfig && await ensureOcReady()) {
         await sendWhatsAppMessage(sender, "Bridge tailor unavailable. Trying OpenCode...");
-        await routeToOc(text);
+        await routeToOc(sender, text);
       } else {
         await sendWhatsAppMessage(sender, `Tailor failed: ${parsed.error}`);
       }
@@ -455,7 +519,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower.startsWith("/cover-letter")) {
-    if (preferOc(sender) && hasOc) { await routeToOc(text); return; }
+    if (tryOcFirst(sender, text)) return;
     await sendWhatsAppMessage(sender, "Generating cover letter...");
     try {
       const args = text.replace(/^\/cover-letter\s*/i, "").trim();
@@ -464,9 +528,9 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       if (parsed.success) {
         const chunks = splitMessage(parsed.cover_letter as string || "", 4000);
         for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
-      } else if (hasOc && await ensureOcReady()) {
+      } else if (OC_ENABLED && ocConfig && await ensureOcReady()) {
         await sendWhatsAppMessage(sender, "Bridge cover letter unavailable. Trying OpenCode...");
-        await routeToOc(text);
+        await routeToOc(sender, text);
       } else {
         await sendWhatsAppMessage(sender, `Cover letter failed: ${parsed.error}`);
       }
@@ -477,7 +541,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower.startsWith("/question")) {
-    if (preferOc(sender) && hasOc) { await routeToOc(text); return; }
+    if (tryOcFirst(sender, text)) return;
     const qText = text.replace(/^\/question\s*/i, "").trim();
     if (!qText) {
       await sendWhatsAppMessage(sender, "Usage: /question <your question> [--jd <job-description>]");
@@ -490,9 +554,9 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       if (parsed.success) {
         const chunks = splitMessage(parsed.answer as string || "", 4000);
         for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
-      } else if (hasOc && await ensureOcReady()) {
+      } else if (OC_ENABLED && ocConfig && await ensureOcReady()) {
         await sendWhatsAppMessage(sender, "Bridge question unavailable. Trying OpenCode...");
-        await routeToOc(text);
+        await routeToOc(sender, text);
       } else {
         await sendWhatsAppMessage(sender, `Question failed: ${parsed.error}`);
       }
@@ -503,7 +567,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower.startsWith("/score")) {
-    if (preferOc(sender) && hasOc) { await routeToOc(text); return; }
+    if (tryOcFirst(sender, text)) return;
     const analysisId = text.replace(/^\/score\s*/i, "").trim();
     if (!analysisId) {
       await sendWhatsAppMessage(sender, "Usage: /score <analysis-id>");
@@ -527,7 +591,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
 
   // ── ATS Ghost / Review / Subscribe ──────────────────────────────────
   if (lower.startsWith("/ghost")) {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     const args = text.replace(/^\/ghost\s*/i, "").trim();
     const parts = args.split(/\s+/);
     const pdfPath = parts[0] || "";
@@ -551,7 +615,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower.startsWith("/review")) {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     const args = text.replace(/^\/review\s*/i, "").trim();
     const parts = args.match(/(["'])(?:(?!\1).)*\1|\S+/g) || [];
     const clean = parts.map((p) => p.replace(/^["']|["']$/g, ""));
@@ -576,7 +640,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower === "/subscribe") {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     await sendWhatsAppMessage(sender, "Subscribing you to RSS job alerts...");
     try {
       const result = subscribeWhatsApp(sender);
@@ -588,7 +652,7 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
   }
 
   if (lower === "/unsubscribe") {
-    if (tryOcFirst()) return;
+    if (tryOcFirst(sender, text)) return;
     await sendWhatsAppMessage(sender, "Unsubscribing from RSS job alerts...");
     try {
       const result = unsubscribeWhatsApp(sender);

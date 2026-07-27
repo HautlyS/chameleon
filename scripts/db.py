@@ -18,9 +18,9 @@ from scripts.config import config
 _local = threading.local()
 
 
-def compute_job_id(title: str, company: str) -> str:
-    """Deterministic 12-char job ID from title+company. FIPS-safe."""
-    raw = f"{title}|{company}".encode()
+def compute_job_id(title: str, company: str, url: str = "", source: str = "") -> str:
+    """Deterministic job ID that distinguishes separate postings at one employer."""
+    raw = f"{title}|{company}|{url}|{source}".encode()
     try:
         return hashlib.md5(raw, usedforsecurity=False).hexdigest()[:12]
     except TypeError:
@@ -116,7 +116,7 @@ def save_job(
     job_id: str | None = None,
 ) -> str:
     """Insert or update a job. Returns the job ID."""
-    job_id = job_id or compute_job_id(title, company)
+    job_id = job_id or compute_job_id(title, company, url, source)
     conn = _get_conn()
     conn.execute(
         """

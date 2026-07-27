@@ -851,7 +851,7 @@ class ChameleonTUI(App):
                 job["score"] = 0
                 job["score_detail"] = {}
             try:
-                job_id = compute_job_id(job.get("title", ""), job.get("company", ""))
+                job_id = compute_job_id(job.get("title", ""), job.get("company", ""), job.get("url", ""), job.get("source", ""))
                 update_job_score(job_id, job["score"], job["score_detail"])
             except Exception:
                 pass
@@ -1433,7 +1433,7 @@ class ChameleonTUI(App):
             "source": job.get("source", "tailored"),
         }
         self.tailored_cvs.append(tc_entry)
-        job_id = compute_job_id(job.get("title", ""), job.get("company", ""))
+        job_id = compute_job_id(job.get("title", ""), job.get("company", ""), job.get("url", ""), job.get("source", ""))
         try:
             save_tailored_cv(
                 job_id=job_id,
@@ -1484,7 +1484,7 @@ class ChameleonTUI(App):
             self.jobs = [j for j in self.jobs if j is not job]
             self.scored_jobs = [j for j in self.scored_jobs if j is not job]
             self.filtered_jobs = [j for j in self.filtered_jobs if j is not job]
-            job_id = compute_job_id(job.get("title", ""), job.get("company", ""))
+            job_id = compute_job_id(job.get("title", ""), job.get("company", ""), job.get("url", ""), job.get("source", ""))
             try:
                 delete_job(job_id)
             except Exception:
