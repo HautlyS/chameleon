@@ -175,3 +175,23 @@ class BaseParser(ABC):
         """Check if Playwright browser automation is available."""
         from .browser import is_playwright_available
         return is_playwright_available()
+
+    @staticmethod
+    def _is_login_wall(text: str) -> bool:
+        """Detect if the page is behind a login/authentication wall.
+
+        Returns True if the page shows a sign-in wall (not just a form on
+        a legitimate content page).
+        """
+        low = text.lower()
+        markers = [
+            "sign in to view", "sign in to see", "sign in to continue",
+            "please sign in", "please log in", "please login",
+            "create an account to view", "create your account to view",
+            "join to view", "join to see", "subscribe to view",
+            "login to view", "login to see",
+            "auth-wall", "authentication-wall",
+        ]
+        # Require at least 2 markers to reduce false positives
+        count = sum(1 for m in markers if m in low)
+        return count >= 2

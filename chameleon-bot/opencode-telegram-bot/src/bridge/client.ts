@@ -77,6 +77,19 @@ class BridgeClient {
   renderCv(yamlPath: string): BridgeResult {
     return this.run(["render", "--yaml", yamlPath], 60000);
   }
+
+  ghostPdf(pdfPath: string, jdFile?: string, extraTerms?: string): BridgeResult {
+    const args = ["ghost", pdfPath, "--json"];
+    if (jdFile) args.push("--jd", jdFile);
+    if (extraTerms) args.push("--extra", extraTerms);
+    return this.run(args, 60000);
+  }
+
+  reviewCv(yamlPath: string, jdFile: string, single = false): BridgeResult {
+    const args = [yamlPath, "--jd", jdFile, "--json"];
+    if (single) args.push("--single");
+    return this.run(args, 180000);
+  }
 }
 
 export const bridge = new BridgeClient();

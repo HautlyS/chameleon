@@ -35,7 +35,7 @@ class WellfoundParser(BaseParser):
                 wait_selector="[data-testid*='job'], .styles_jobCard",
                 scroll=True,
             )
-            if browser_resp:
+            if browser_resp and not self._is_login_wall(browser_resp.text):
                 self._parse_html(browser_resp.text, jobs, query, limit)
 
         return jobs

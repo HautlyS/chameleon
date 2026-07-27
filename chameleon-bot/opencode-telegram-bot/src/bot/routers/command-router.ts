@@ -163,6 +163,49 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
     }
   });
 
+  // Ghost — inject ATS text
+  bot.command("ghost", async (ctx) => {
+    const text = ctx.message?.text || "";
+    const args = text.replace(/^\/ghost\s*/i, "").trim();
+    const parts = args.split(/\s+/);
+    const pdfPath = parts[0] || "";
+    if (!pdfPath) {
+      await ctx.reply("Usage: /ghost <pdf_path> [extra_terms]");
+      return;
+    }
+    await ctx.reply("Injecting ATS ghost text...");
+    const result = bridge.ghostPdf(pdfPath, undefined, parts.slice(1).join(" "));
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      await ctx.reply(`ATS ghost injected: ${data.terms_injected} terms`);
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  // Review — double AI review
+  bot.command("review", async (ctx) => {
+    const text = ctx.message?.text || "";
+    const parts = text.replace(/^\/review\s*/i, "").trim().split(/\s+/);
+    const yamlPath = parts[0] || "";
+    if (!yamlPath || parts.length < 2) {
+      await ctx.reply("Usage: /review <yaml_path> <jd_file>");
+      return;
+    }
+    const jdFile = parts[1];
+    await ctx.reply("Running double AI review...");
+    const result = bridge.reviewCv(yamlPath, jdFile);
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      const review = data.review as Record<string, unknown> || {};
+      const score = review.overall_score || "?";
+      const approved = data.approved ? "Yes" : "No";
+      await ctx.reply(`Review score: ${score}/100\nApproved: ${approved}`);
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
   // AI-powered commands → OpenCode (no bridge equivalent)
   for (const cmd of ["chameleon", "cover_letter", "question", "score"]) {
     bot.command(cmd, (ctx) => chameleonCommandHandler(ctx, chameleonCtx));

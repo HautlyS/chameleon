@@ -41,6 +41,8 @@ class BotOrchestrator:
                 instance_name=self.config.whatsapp_instance_name,
                 default_to=self.config.whatsapp_notify_number or "",
             )
+            if hasattr(self.whatsapp, 'broadcast_numbers') and self.config.whatsapp_notify_numbers:
+                self.whatsapp.broadcast_numbers = self.config.whatsapp_notify_numbers
 
     def _init_rss(self):
         if not self.config.rss_enabled:
@@ -51,14 +53,16 @@ class BotOrchestrator:
             msg = f"🔍 *RSS Scan*: {n} new job{'s' if n != 1 else ''} found"
             if self.telegram:
                 self.telegram.send_message(msg)
-            if self.whatsapp and self.whatsapp.default_to:
-                self.whatsapp.send_message(self.whatsapp.default_to, msg.replace("*", ""))
+            if self.whatsapp:
+                for num in self.config.whatsapp_notify_numbers:
+                    self.whatsapp.send_message(num, msg.replace("*", ""))
 
         def on_high(job: dict[str, Any], score: int):
             if self.telegram:
                 self.telegram.send_job_alert(job, score)
-            if self.whatsapp and self.whatsapp.default_to:
-                self.whatsapp.send_job_alert(self.whatsapp.default_to, job, score)
+            if self.whatsapp:
+                for num in self.config.whatsapp_notify_numbers:
+                    self.whatsapp.send_job_alert(num, job, score)
 
         self.rss = RssScanner(
             config=self.config,
@@ -88,13 +92,15 @@ class BotOrchestrator:
                 msg = f"🔍 *Scan complete*: {len(new)} jobs found"
                 if self.telegram:
                     self.telegram.send_message(msg)
-                if self.whatsapp and self.whatsapp.default_to:
-                    self.whatsapp.send_message(self.whatsapp.default_to, msg.replace("*", ""))
+                for num in self.config.whatsapp_notify_numbers:
+                    if self.whatsapp:
+                        self.whatsapp.send_message(num, msg.replace("*", ""))
                 for job in new[:5]:
                     if self.telegram:
                         self.telegram.send_job_alert(job)
-                    if self.whatsapp and self.whatsapp.default_to:
-                        self.whatsapp.send_job_alert(self.whatsapp.default_to, job)
+                    for num in self.config.whatsapp_notify_numbers:
+                        if self.whatsapp:
+                            self.whatsapp.send_job_alert(num, job)
         return jobs
 
     def tailor_for_job(
@@ -123,22 +129,24 @@ class BotOrchestrator:
             notify_msg = f"✅ *CV tailored* for {analysis.get('role_title', '?')} at {analysis.get('company_name', '?')}"
             if self.config.telegram_notifications_enabled and self.telegram:
                 self.telegram.send_message(f"{notify_msg}\n\n{output}")
-            if self.whatsapp and self.whatsapp.default_to:
-                self.whatsapp.send_message(self.whatsapp.default_to, notify_msg.replace("*", ""))
+            for num in self.config.whatsapp_notify_numbers:
+                if self.whatsapp:
+                    self.whatsapp.send_message(num, notify_msg.replace("*", ""))
 
-            # Send rendered PDF if available
             pdf_path = self._find_rendered_pdf(analysis)
             if pdf_path:
                 if self.telegram:
                     self.telegram.send_document(str(pdf_path), caption=f"CV for {analysis.get('role_title', '?')} at {analysis.get('company_name', '?')}")
-                if self.whatsapp and self.whatsapp.default_to:
-                    self.whatsapp.send_media(self.whatsapp.default_to, str(pdf_path), caption=f"CV for {analysis.get('role_title', '?')} at {analysis.get('company_name', '?')}")
+                for num in self.config.whatsapp_notify_numbers:
+                    if self.whatsapp:
+                        self.whatsapp.send_media(num, str(pdf_path), caption=f"CV for {analysis.get('role_title', '?')} at {analysis.get('company_name', '?')}")
         else:
             msg = result.get("error", "Tailoring failed")
             if self.config.telegram_notifications_enabled and self.telegram:
                 self.telegram.send_error(msg)
-            if self.whatsapp and self.whatsapp.default_to:
-                self.whatsapp.send_error(self.whatsapp.default_to, msg)
+            for num in self.config.whatsapp_notify_numbers:
+                if self.whatsapp:
+                    self.whatsapp.send_error(num, msg)
 
         return result
 
@@ -153,5 +161,6 @@ class BotOrchestrator:
     def send_notification(self, text: str) -> None:
         if self.telegram:
             self.telegram.send_message(text)
-        if self.whatsapp and self.whatsapp.default_to:
-            self.whatsapp.send_message(self.whatsapp.default_to, text.replace("*", ""))
+        for num in self.config.whatsapp_notify_numbers:
+            if self.whatsapp:
+                self.whatsapp.send_message(num, text.replace("*", ""))

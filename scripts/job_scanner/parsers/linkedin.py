@@ -49,7 +49,7 @@ class LinkedInParser(BaseParser):
                 wait_selector=".job-card-container",
                 scroll=True,
             )
-            if browser_resp:
+            if browser_resp and not self._is_login_wall(browser_resp.text):
                 self._parse_browser_html(browser_resp.text, jobs, query, limit)
 
         return jobs

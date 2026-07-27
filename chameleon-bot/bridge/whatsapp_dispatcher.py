@@ -56,6 +56,24 @@ class WhatsAppDispatcher:
             return None
 
     def send_message(self, to: str, text: str) -> bool:
+        if to == "*" and self.default_to:
+            return self.send_message(self.default_to, text)
+        if to == "*ALL*":
+            results = [self.send_message(n, text) for n in self.broadcast_numbers]
+            return any(results)
+        result = self._request(f"message/sendText/{self.instance_name}", {
+            "number": to,
+            "text": text,
+        })
+        return result is not None and result.get("status") in ("success", 200, "200")
+
+    @property
+    def broadcast_numbers(self) -> list[str]:
+        return getattr(self, "_broadcast", [self.default_to] if self.default_to else [])
+
+    @broadcast_numbers.setter
+    def broadcast_numbers(self, numbers: list[str]):
+        self._broadcast = numbers
         result = self._request(f"message/sendText/{self.instance_name}", {
             "number": to,
             "text": text,

@@ -151,3 +151,38 @@ export function scoreJob(analysisIdOrPath: string, config?: Partial<BridgeConfig
 export function getAnalysis(analysisIdOrPath: string, config?: Partial<BridgeConfig>): string {
   return runBridge(["analysis", "--analysis", analysisIdOrPath, "--json"], 30000, config);
 }
+
+export function ghostPdf(
+  pdfPath: string,
+  jdText?: string,
+  extraTerms?: string,
+  config?: Partial<BridgeConfig>,
+): string {
+  const args = ["ghost", pdfPath, "--json"];
+  if (jdText) {
+    const jdPath = tempFile("ghost_jd", jdText);
+    args.push("--jd", jdPath);
+  }
+  if (extraTerms) args.push("--extra", extraTerms);
+  return runBridge(args, 60000, config);
+}
+
+export function reviewCv(
+  yamlPath: string,
+  jdText: string,
+  single?: boolean,
+  config?: Partial<BridgeConfig>,
+): string {
+  const jdPath = tempFile("review_jd", jdText);
+  const args = [yamlPath, "--jd", jdPath, "--json"];
+  if (single) args.push("--single");
+  return runBridge(args, 180000, config);
+}
+
+export function subscribeWhatsApp(phoneNumber: string, config?: Partial<BridgeConfig>): string {
+  return runBridge(["subscribe", "--subscribe", phoneNumber], 30000, config);
+}
+
+export function unsubscribeWhatsApp(phoneNumber: string, config?: Partial<BridgeConfig>): string {
+  return runBridge(["unsubscribe", "--unsubscribe", phoneNumber], 30000, config);
+}

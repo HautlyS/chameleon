@@ -15,6 +15,10 @@ import {
   coverLetter,
   answerQuestion,
   scoreJob,
+  ghostPdf,
+  reviewCv,
+  subscribeWhatsApp,
+  unsubscribeWhatsApp,
 } from "./bridge.js";
 
 import { readFileSync } from "fs";
@@ -427,6 +431,76 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       } else {
         await sendWhatsAppMessage(sender, `Score error: ${parsed.error}`);
       }
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  // ── ATS Ghost / Review / Subscribe ──────────────────────────────────
+  if (lower.startsWith("/ghost")) {
+    const args = text.replace(/^\/ghost\s*/i, "").trim();
+    const parts = args.split(/\s+/);
+    const pdfPath = parts[0] || "";
+    if (!pdfPath) {
+      await sendWhatsAppMessage(sender, "Usage: /ghost <pdf_path> [jd_text]");
+      return;
+    }
+    await sendWhatsAppMessage(sender, "Injecting ATS ghost text...");
+    try {
+      const result = ghostPdf(pdfPath, parts.slice(1).join(" ") || undefined);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      if (parsed.success) {
+        await sendWhatsAppMessage(sender, `ATS ghost injected: ${parsed.terms_injected} terms into ${pdfPath}`);
+      } else {
+        await sendWhatsAppMessage(sender, `Ghost failed: ${parsed.error}`);
+      }
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower.startsWith("/review")) {
+    const args = text.replace(/^\/review\s*/i, "").trim();
+    const parts = args.match(/(["'])(?:(?!\1).)*\1|\S+/g) || [];
+    const clean = parts.map((p) => p.replace(/^["']|["']$/g, ""));
+    const yamlPath = clean[0] || "";
+    const jdText = clean.slice(1).join(" ");
+    if (!yamlPath || !jdText) {
+      await sendWhatsAppMessage(sender, "Usage: /review <yaml_path> <jd_text>");
+      return;
+    }
+    await sendWhatsAppMessage(sender, "Running double AI review...");
+    try {
+      const result = reviewCv(yamlPath, jdText);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      const review = parsed.review as Record<string, unknown> || {};
+      const score = review.overall_score || "?";
+      const approved = parsed.approved ? "Yes" : "No";
+      await sendWhatsAppMessage(sender, `Review: ${score}/100\nApproved: ${approved}`);
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower === "/subscribe") {
+    await sendWhatsAppMessage(sender, "Subscribing you to RSS job alerts...");
+    try {
+      const result = subscribeWhatsApp(sender);
+      await sendWhatsAppMessage(sender, `Subscribed! You'll receive RSS job alerts at ${sender}.`);
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower === "/unsubscribe") {
+    await sendWhatsAppMessage(sender, "Unsubscribing from RSS job alerts...");
+    try {
+      const result = unsubscribeWhatsApp(sender);
+      await sendWhatsAppMessage(sender, "Unsubscribed from RSS job alerts.");
     } catch (err) {
       await sendWhatsAppMessage(sender, `Error: ${err}`);
     }

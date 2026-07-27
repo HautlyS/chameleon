@@ -90,6 +90,14 @@ class BridgeConfig:
         return env or self._data.get("whatsapp", {}).get("notify_number", "")
 
     @property
+    def whatsapp_notify_numbers(self) -> list[str]:
+        nums = list(self._data.get("whatsapp", {}).get("notify_numbers", []))
+        single = self.whatsapp_notify_number
+        if single and single not in nums:
+            nums.insert(0, single)
+        return nums
+
+    @property
     def rss_enabled(self) -> bool:
         return self._data.get("rss", {}).get("enabled", True)
 

@@ -148,6 +148,46 @@ class ChameleonClient:
         finally:
             Path(jd_path).unlink(missing_ok=True)
 
+    def inject_ghost(self, pdf_path: str | Path, jd_text: str = "", extra_terms: str = "") -> dict[str, Any]:
+        args = [str(pdf_path), "--json"]
+        if jd_text:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+                f.write(jd_text)
+                jd_path = f.name
+            args.extend(["--jd", jd_path])
+        if extra_terms:
+            args.extend(["--extra", extra_terms])
+
+        try:
+            result = self._run_script("scripts.ghost", args)
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            return {"success": False, "error": result.stderr.strip() or result.stdout.strip()}
+        except (json.JSONDecodeError, Exception) as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            if jd_text:
+                Path(jd_path).unlink(missing_ok=True)
+
+    def review_cv(self, yaml_path: str | Path, jd_text: str, single: bool = False) -> dict[str, Any]:
+        args = [str(yaml_path), "--json"]
+        if single:
+            args.append("--single")
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(jd_text)
+            jd_path = f.name
+        args.extend(["--jd", jd_path])
+
+        try:
+            result = self._run_script("scripts.review", args)
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            return {"success": False, "error": result.stderr.strip() or result.stdout.strip()}
+        except (json.JSONDecodeError, Exception) as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            Path(jd_path).unlink(missing_ok=True)
+
     def render_cv(self, yaml_path: str | Path) -> dict[str, Any]:
         result = self._run_script("scripts.render", [str(yaml_path)])
         stem = Path(yaml_path).stem
