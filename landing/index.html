@@ -1,215 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Chameleon — AI-powered resume tailor. Paste a job description, get a tailored PDF. CLI-native, no signup, no fluff.">
-  <title>Chameleon — Resume Tailor</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Chameleon tailors fact-grounded, ATS-ready resumes from your terminal."><title>Chameleon | Resume tailoring for the terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="refinement.css"><link rel="stylesheet" href="card-refinement.css">
 </head>
 <body>
+  <div class="velvet velvet-one" aria-hidden="true"></div><div class="velvet velvet-two" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div><div class="mandala" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <header class="site-header"><a class="brand" href="#top" aria-label="Chameleon home"><span class="brand-mark">&lt;&gt;</span>chameleon</a><nav aria-label="Main navigation"><a href="#workflow">workflow</a><a href="#use-cases">use cases</a><a href="#commands">commands</a><a href="#docs">docs</a></nav><a class="header-action" href="#install">get started <span aria-hidden="true">↘</span></a></header>
+  <main id="top">
+    <section class="hero"><div class="hero-copy"><p class="eyebrow"><span></span> Precision tailoring for considered careers</p><h1>Apply with a<br><em>clearer signal.</em></h1><p class="lede">Chameleon turns a job post into a tailored resume without turning your career into fiction. Research the role, preserve the proof, and send a polished PDF from one considered workflow.</p><div class="actions"><a class="button primary" href="#install">install Chameleon <span>↓</span></a><a class="button secondary" href="https://github.com/hautlyS/chameleon" target="_blank" rel="noreferrer">view on GitHub <span>↗</span></a></div><div class="hero-note"><span class="pulse"></span> Open source · local artifacts · no account required</div></div><div class="hero-stage"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="terminal hero-terminal" aria-label="Example Chameleon terminal session"><div class="terminal-bar"><span></span><span></span><span></span><b>chameleon — tailoring session</b><em>ready</em></div><div class="terminal-body"><p><i>$</i> ./chameleon tailor jobs/role.txt</p><p class="muted">reading role signals <b>······</b> done</p><p><strong>✓</strong> requirements and ATS language mapped</p><p><strong>✓</strong> career facts preserved</p><p><strong>✓</strong> tailored YAML reviewed</p><p><strong>✓</strong> PDF written to <a href="../output/">output/</a></p><p class="cursor"><i>$</i> <span></span></p></div></div><p class="stage-caption"><span>●</span> Designed for deliberate applications</p></div></section>
+    <section class="marquee" aria-label="Core benefits"><div class="marquee-track"><div class="marquee-group">FACT-GROUNDED <b>✦</b> ATS-READY <b>✦</b> LOCAL ARTIFACTS <b>✦</b> CLI + TUI <b>✦</b></div><div class="marquee-group" aria-hidden="true">FACT-GROUNDED <b>✦</b> ATS-READY <b>✦</b> LOCAL ARTIFACTS <b>✦</b> CLI + TUI <b>✦</b></div></div></section>
+    <section class="section intro" id="workflow"><div class="section-head"><p class="eyebrow">01 / workflow</p><h2>From raw post to<br>ready-to-send.</h2><p class="section-copy">A restrained process that makes the job requirements visible, then responds only with evidence already in your resume.</p></div><div class="workflow-grid"><article><span>01</span><h3>Bring the job</h3><p>Pass a URL, text, file, or piped job description. Chameleon extracts requirements, seniority, keywords, and positioning signals.</p><code>./chameleon tailor jd.txt</code></article><article><span>02</span><h3>Tailor without fiction</h3><p>Only the summary, experience highlights, and skill order change. Companies, dates, titles, metrics, and fixed sections stay intact.</p><code>analysis → tailored YAML</code></article><article><span>03</span><h3>Review and render</h3><p>The pipeline reviews the tailored CV, persists its job analysis, and renders a clean PDF through RenderCV’s Typst backend.</p><code>YAML → ATS-ready PDF</code></article></div></section>
+    <section class="section use-cases" id="use-cases"><div class="section-head"><p class="eyebrow">02 / real application moments</p><h2>Made for the work<br>around the work.</h2></div><div class="case-layout"><article class="case-card featured-case"><p class="card-kicker">THE FOCUSED SEARCH</p><span class="case-index">01</span><h3>For the role you actually want.</h3><p>Move from one thoughtful job post to one tailored version of your resume, saved with its analysis and source files for later reference.</p><div class="case-detail"><span>Input</span><b>Job URL or JD file</b><span>Output</span><b>Tailored PDF + analysis JSON</b></div></article><article class="case-card"><p class="card-kicker">THE ACTIVE PIPELINE</p><span class="case-index">02</span><h3>For a week of applications.</h3><p>Scan job boards, keep results in the TUI, tailor intentionally, then score your resume before you submit.</p><code>./chameleon scan --tier1</code></article><article class="case-card"><p class="card-kicker">THE INTERVIEW LOOP</p><span class="case-index">03</span><h3>For consistent follow-through.</h3><p>Reuse the saved job analysis to check a revised CV, generate a grounded cover letter, or answer a screening question.</p><code>analysis → score → cover</code></article></div></section>
+    <section class="section feature-section" id="features"><div class="section-head"><p class="eyebrow">03 / product surface</p><h2>Everything stays<br>in your hands.</h2></div><div class="feature-grid"><article class="feature-card large"><p class="card-kicker">ANALYZE ONCE, REUSE LATER</p><h3>Structured job intelligence.</h3><p>Each job analysis is saved as JSON, so you can tailor again, score a version, or build a cover letter from the same evidence.</p><div class="mini-code">output/job_analyses/<br><b>9a2f__acme__engineer.json</b></div></article><article class="feature-card"><p class="card-kicker">MATCH SCORE</p><h3>Know the gaps before applying.</h3><p>Compare a CV against a saved job analysis across languages, frameworks, domains, and CV alignment.</p><div class="score"><b>85</b><span>/ 100<br>grounded match</span></div></article><article class="feature-card"><p class="card-kicker">20 SOURCES</p><h3>Find jobs where you work.</h3><p>Scan supported job platforms from the CLI or use the six-tab terminal UI to inspect jobs, gaps, PDFs, and settings.</p><a href="../docs/TUI.md">read the TUI reference ↗</a></article><article class="feature-card"><p class="card-kicker">YOUR TOOL, YOUR FLOW</p><h3>CLI, TUI, or AI assistant.</h3><p>Use shell commands, launch the terminal UI, or invoke included skills in Codex, Claude Code, or OpenCode.</p><a href="../opencode.json">view assistant config ↗</a></article></div></section>
+    <section class="section command-section" id="commands"><div class="section-head"><p class="eyebrow">04 / command reference</p><h2>A small command surface.<br>A complete workflow.</h2></div><div class="command-layout"><div class="command-tabs" role="tablist" aria-label="Command examples"><button class="active" data-command="tailor" role="tab">tailor</button><button data-command="score" role="tab">score</button><button data-command="scan" role="tab">scan</button><button data-command="tui" role="tab">tui</button><button data-command="render" role="tab">render</button></div><div class="command-panel" aria-live="polite"><p class="command-label">TAILOR A RESUME</p><pre><span class="prompt">$</span> ./chameleon tailor jd.txt --company Acme
 
-  <!-- GLOBAL NAV -->
-  <nav class="nav" role="navigation" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="." class="nav-logo">
-        <span class="logo-mark">◇</span>
-        <span class="logo-text">chameleon</span>
-      </a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#testimonials">Testimonials</a>
-        <a href="#docs" class="nav-docs">Docs</a>
-      </div>
-      <a href="#cta" class="nav-cta btn-primary">Get Started</a>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-inner">
-      <div class="hero-content">
-        <h1 class="hero-headline">
-          Tailor your resume<br>
-          to any job in<br>
-          <span class="hero-accent">one command.</span>
-        </h1>
-        <p class="hero-sub">
-          Paste a job description. Get a tailored, ATS-optimized PDF.
-          CLI-native, AI-powered, zero setup.
-        </p>
-        <div class="hero-actions">
-          <a href="#cta" class="btn-primary btn-large">Try It Now</a>
-          <a href="#features" class="btn-ghost">How It Works</a>
-        </div>
-        <p class="hero-footnote">No signup &middot; No credit card &middot; Open source</p>
-      </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="brutalist-shape">
-          <div class="shape-layer shape-layer-1"></div>
-          <div class="shape-layer shape-layer-2"></div>
-          <div class="shape-layer shape-layer-3"></div>
-          <div class="shape-layer shape-layer-4"></div>
-          <div class="shape-code">$ chameleon tailor jd.txt</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUSTED BY -->
-  <section class="trusted" id="trusted">
-    <div class="trusted-inner">
-      <p class="trusted-label">Used by engineers at</p>
-      <div class="trusted-logos">
-        <span class="logo-chip">Vercel</span>
-        <span class="logo-chip">Stripe</span>
-        <span class="logo-chip">Linear</span>
-        <span class="logo-chip">Railway</span>
-        <span class="logo-chip">Supabase</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURES (Bento) -->
-  <section class="features" id="features">
-    <div class="features-inner">
-      <h2 class="section-label">Features</h2>
-      <div class="bento">
-        <div class="bento-cell bento-cell-tall">
-          <h3 class="bento-title">CLI-native workflow</h3>
-          <p class="bento-body">Your terminal is the dashboard. No web UI, no tabs, no loading spinners. One command in, one PDF out.</p>
-          <div class="bento-meta">Works with bash, zsh, fish, PowerShell</div>
-        </div>
-        <div class="bento-cell bento-cell-tall">
-          <h3 class="bento-title">AI analysis engine</h3>
-          <p class="bento-body">Extracts required skills, preferred skills, ATS keywords, seniority signals, and positioning angles from any job description.</p>
-          <div class="bento-meta">Persisted locally as structured JSON</div>
-        </div>
-        <div class="bento-cell">
-          <h3 class="bento-title">ATS-ready PDF</h3>
-          <p class="bento-body">RenderCV with Typst backend produces a clean, parseable PDF that ATS systems can read. No LaTeX required.</p>
-        </div>
-        <div class="bento-cell">
-          <h3 class="bento-title">Score your match</h3>
-          <p class="bento-body">Grounded 0-100 score across languages, frameworks, domains, and CV alignment. Know where you stand before you apply.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section class="steps" id="how-it-works">
-    <div class="steps-inner">
-      <h2 class="section-label">How It Works</h2>
-      <div class="steps-track">
-        <div class="step">
-          <span class="step-number">01</span>
-          <div class="step-content">
-            <h3 class="step-title">Paste a job URL or description</h3>
-            <p class="step-body">Any job posting from LinkedIn, Indeed, or a plain text JD. Chameleon reads it raw.</p>
-          </div>
-        </div>
-        <div class="step-divider"></div>
-        <div class="step">
-          <span class="step-number">02</span>
-          <div class="step-content">
-            <h3 class="step-title">AI analyzes and tailors your CV</h3>
-            <p class="step-body">Extracts signal, rewrites highlights to match the JD language, preserves your facts. No fabrication.</p>
-          </div>
-        </div>
-        <div class="step-divider"></div>
-        <div class="step">
-          <span class="step-number">03</span>
-          <div class="step-content">
-            <h3 class="step-title">Download a tailored PDF, ready to submit</h3>
-            <p class="step-body">ATS-friendly, 2 pages max, saved under templates/ alongside your master resume.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section class="testimonials" id="testimonials">
-    <div class="testimonials-inner">
-      <h2 class="section-label">Testimonials</h2>
-      <div class="testimonials-grid">
-        <blockquote class="quote-card">
-          <p class="quote-text">"I used to spend 45 minutes tailoring each resume. Now it's one command. The AI actually respects my experience — it rewrites, it doesn't invent."</p>
-          <footer class="quote-attribution">
-            <span class="quote-name">Sarah K.</span>
-            <span class="quote-role">Senior Engineer</span>
-          </footer>
-        </blockquote>
-        <blockquote class="quote-card">
-          <p class="quote-text">"The ATS ghost injection alone got me 3x more callbacks. Submitted the same base CV tailored with Chameleon vs my manual version. Night and day."</p>
-          <footer class="quote-attribution">
-            <span class="quote-name">Marcus T.</span>
-            <span class="quote-role">Product Designer</span>
-          </footer>
-        </blockquote>
-        <blockquote class="quote-card">
-          <p class="quote-text">"I scanned 12 job listings, tailored for all of them in under 3 minutes. The batch mode is a superpower for active job seekers."</p>
-          <footer class="quote-attribution">
-            <span class="quote-name">Aiko Y.</span>
-            <span class="quote-role">Data Scientist</span>
-          </footer>
-        </blockquote>
-      </div>
-    </div>
-  </section>
-
-  <!-- FINAL CTA -->
-  <section class="cta-section" id="cta">
-    <div class="cta-inner">
-      <h2 class="cta-headline">
-        Stop rewriting.<br>
-        <span class="hero-accent">Start tailoring.</span>
-      </h2>
-      <a href="#" class="btn-primary btn-large cta-btn">Install Now</a>
-      <p class="cta-footnote">No signup. No credit card. One command, one PDF.</p>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer" id="docs">
-    <div class="footer-inner">
-      <div class="footer-col">
-        <h4 class="footer-heading">Product</h4>
-        <ul class="footer-links">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#">CLI</a></li>
-          <li><a href="#">Integrations</a></li>
-          <li><a href="#">Pricing</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-heading">Resources</h4>
-        <ul class="footer-links">
-          <li><a href="#">Documentation</a></li>
-          <li><a href="#">Examples</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">FAQ</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4 class="footer-heading">Company</h4>
-        <ul class="footer-links">
-          <li><a href="#">GitHub</a></li>
-          <li><a href="#">License</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-legal">
-      <p>&copy; 2026 Chameleon. MIT License.</p>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
+<span class="comment"># accepts a job URL, raw text, file path, or stdin</span>
+<span class="prompt">$</span> cat jd.txt | ./chameleon tailor --title "Engineer"</pre><p class="command-description">Analyze a posting, tailor a new resume YAML from the configured master CV, review it, and render the PDF.</p><a class="text-link command-doc-link" href="../README.md#3-cli--headless--scripting">CLI documentation ↗</a></div></div><p class="command-foot">Need every available flag? Run <code>./chameleon help</code> or open the <a href="../README.md">complete README</a>.</p></section>
+    <section class="section docs-section" id="docs"><div class="section-head"><p class="eyebrow">05 / docs and setup</p><h2>Clone. Set up. Run.</h2><p class="section-copy">Every route below maps to a real repository file or command. Choose your operating system and copy exactly what you need.</p></div><div class="setup-grid"><article class="setup-card" id="install"><div class="card-top"><span>01</span><h3>Install dependencies</h3><button class="copy-button" data-copy="git clone https://github.com/hautlyS/chameleon.git&#10;cd chameleon&#10;make setup" aria-label="Copy install commands">copy</button></div><pre>git clone https://github.com/hautlyS/chameleon.git
+cd chameleon
+make setup</pre><p>Requires Python 3.10+ and Make. Setup creates <code>.venv</code>, installs dependencies and RenderCV, then prepares local directories.</p><a href="../Makefile">open Makefile ↗</a></article><article class="setup-card"><div class="card-top"><span>02</span><h3>Run on macOS / Linux</h3><button class="copy-button" data-copy="./chameleon tui&#10;./chameleon tailor jd.txt&#10;./chameleon scan -q &quot;rust engineer&quot; --tier1" aria-label="Copy macOS and Linux commands">copy</button></div><pre>./chameleon tui
+./chameleon tailor jd.txt
+./chameleon scan -q "rust engineer" --tier1</pre><p>Launch the UI, tailor from a job description, or scan the fast API/RSS platform tier.</p><a href="../chameleon.sh">open CLI script ↗</a></article><article class="setup-card"><div class="card-top"><span>03</span><h3>Run on Windows</h3><button class="copy-button" data-copy="chameleon.bat tui&#10;chameleon.bat tailor jd.txt&#10;chameleon.bat score jd.txt --json" aria-label="Copy Windows commands">copy</button></div><pre>chameleon.bat tui
+chameleon.bat tailor jd.txt
+chameleon.bat score jd.txt --json</pre><p>The Windows batch entry point supports the same core tailoring, scoring, scanning, and rendering commands.</p><a href="../chameleon.bat">open Windows script ↗</a></article></div><div class="doc-links"><a href="../README.md"><span>README</span><b>Every interface, command, configuration, and workflow</b><i>↗</i></a><a href="../docs/TUI.md"><span>TUI GUIDE</span><b>All tabs, keyboard shortcuts, and terminal UI behavior</b><i>↗</i></a><a href="../docs/ARCHITECTURE.md"><span>ARCHITECTURE</span><b>Pipeline, persistence, and component structure</b><i>↗</i></a><a href="https://github.com/hautlyS/chameleon" target="_blank" rel="noreferrer"><span>GITHUB</span><b>Issues, source code, and latest repository state</b><i>↗</i></a></div></section>
+    <section class="section faq-section" id="faq"><div class="section-head"><p class="eyebrow">06 / FAQ</p><h2>Clear answers,<br>before you begin.</h2></div><div class="faq-list"><details><summary>Will Chameleon invent experience or qualifications?<span>+</span></summary><p>No. Tailoring is constrained to wording, ordering, and emphasis supported by the master resume. Companies, titles, dates, locations, and metrics are preserved.</p></details><details><summary>What can I pass into the tailor command?<span>+</span></summary><p>A job posting URL, pasted text, a text-file path, or standard input. The workflow extracts the role signal and saves a reusable JSON analysis locally.</p></details><details><summary>Can I use the same job analysis for later documents?<span>+</span></summary><p>Yes. A saved analysis can be reused to tailor another CV, score a version, generate a cover letter, or prepare a screening-question response.</p></details><details><summary>Where can I read the full documentation?<span>+</span></summary><p>The documentation links below open GitHub’s rendered Markdown view, rather than the plain source file.</p></details></div></section>
+    <section class="final-cta"><div class="ascii-field" aria-hidden="true">░▒▓█▓▒░<br>▒░█░▒▓<br>░▓▒░█▒</div><p class="eyebrow">READY WHEN YOU ARE</p><h2>Make every<br><em>application count.</em></h2><div class="actions"><a class="button primary" href="#install">start with setup <span>↓</span></a><a class="button secondary" href="https://github.com/hautlyS/chameleon/blob/master/README.md" target="_blank" rel="noreferrer">read the docs <span>↗</span></a></div></section>
+  </main>
+  <footer><a class="brand" href="#top"><span class="brand-mark">&lt;&gt;</span>chameleon</a><p>Fact-grounded tailoring for the job search.</p><div><a href="https://github.com/hautlyS/chameleon" target="_blank" rel="noreferrer">GitHub ↗</a><a href="../LICENSE">MIT License ↗</a></div></footer><script src="script.js"></script>
 </body>
 </html>
