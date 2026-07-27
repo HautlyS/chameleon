@@ -1,5 +1,5 @@
 // WhatsApp interactive menu system for Chameleon bot.
-// Uses Evolution API interactive messages (buttons, lists, polls).
+// Uses Evolution API interactive messages (buttons, lists).
 // Falls back to formatted text when interactive messages fail.
 
 export interface Button {
@@ -47,7 +47,7 @@ export async function sendButtonMenu(
     description: body,
     footer: "Chameleon Bot",
     buttons: buttons.map((b) => ({
-      title: "reply",
+      title: "reply" as const,
       displayText: b.text,
       id: b.id,
     })),
@@ -105,11 +105,15 @@ export async function sendListMenu(
 }
 
 // ── Text-based fallback menu ─────────────────────────────────────────
-// Used when interactive messages fail (e.g., Evolution API v2.3.7 bug)
+
+interface MenuItem {
+  command: string;
+  label: string;
+}
 
 export function formatTextMenu(
   title: string,
-  items: Array<{ command: string; label: string; description: string }>,
+  items: MenuItem[],
   extras?: string[],
 ): string {
   const lines = [
@@ -126,34 +130,32 @@ export function formatTextMenu(
 
 // ── Pre-built menus ──────────────────────────────────────────────────
 
-export const MAIN_MENU: Array<{ command: string; label: string; description: string }> = [
-  { command: "/scan <query>", label: "🔍 Search jobs across 17 platforms", description: "" },
-  { command: "/analyses", label: "📊 List saved job analyses", description: "" },
-  { command: "/cvs", label: "📄 List tailored CVs", description: "" },
-  { command: "/render <path>", label: "🖨️ Render YAML to PDF", description: "" },
-  { command: "/chameleon <url>", label: "🎯 Full tailor workflow", description: "" },
-  { command: "/cover-letter <url>", label: "✉️ Generate cover letter", description: "" },
-  { command: "/question <text>", label: "❓ Answer screening question", description: "" },
-  { command: "/score <id>", label: "⭐ Score a tailored CV", description: "" },
-  { command: "/ghost <pdf>", label: "👻 Inject ATS ghost text", description: "" },
-  { command: "/review <yaml>", label: "🔬 Double AI review on CV", description: "" },
-  { command: "/subscribe", label: "🔔 Subscribe to RSS alerts", description: "" },
-  { command: "/unsubscribe", label: "🔕 Unsubscribe from RSS alerts", description: "" },
-  { command: "/new", label: "🆕 New OpenCode session", description: "" },
-  { command: "/abort", label: "⏹️ Abort current task", description: "" },
-  { command: "/status", label: "📡 Connection status", description: "" },
-  { command: "/menu", label: "📋 Show this menu", description: "" },
-  { command: "/help", label: "ℹ️ Help & commands", description: "" },
+export const MAIN_MENU: MenuItem[] = [
+  { command: "/scan <query>", label: "🔍 Search jobs across 17 platforms" },
+  { command: "/analyses", label: "📊 List saved job analyses" },
+  { command: "/cvs", label: "📄 List tailored CVs" },
+  { command: "/render <path>", label: "🖨️ Render YAML to PDF" },
+  { command: "/chameleon <url>", label: "🎯 Full tailor workflow" },
+  { command: "/cover-letter <url>", label: "✉️ Generate cover letter" },
+  { command: "/question <text>", label: "❓ Answer screening question" },
+  { command: "/score <id>", label: "⭐ Score a tailored CV" },
+  { command: "/new", label: "🆕 New OpenCode session" },
+  { command: "/abort", label: "⏹️ Abort current task" },
+  { command: "/mode", label: "🔄 Toggle bridge-first / OC-first routing" },
+  { command: "/ghost <path>", label: "👻 Inject ATS ghost text into PDF" },
+  { command: "/review <yaml> <jd>", label: "🔍 Double AI review of CV" },
+  { command: "/subscribe", label: "🔔 Subscribe to RSS job alerts" },
+  { command: "/unsubscribe", label: "🔕 Unsubscribe from job alerts" },
+  { command: "/status", label: "📡 Connection status" },
+  { command: "/menu", label: "📋 Show this menu" },
+  { command: "/help", label: "ℹ️ Help & commands" },
 ];
 
 export function mainMenuAsButtons(): Button[] {
   return [
     { id: "scan", text: "🔍 Scan Jobs" },
     { id: "analyses", text: "📊 Analyses" },
-    { id: "cvs", text: "📄 CVs" },
     { id: "chameleon", text: "🎯 Tailor CV" },
-    { id: "cover-letter", text: "✉️ Cover Letter" },
-    { id: "status", text: "📡 Status" },
   ];
 }
 
@@ -183,6 +185,15 @@ export function mainMenuAsListSections(): ListSection[] {
       ],
     },
     {
+      title: "ATS & Alerts",
+      rows: [
+        { id: "ghost", title: "👻 Ghost PDF", description: "Inject ATS ghost text" },
+        { id: "review", title: "🔍 Review CV", description: "Double AI review" },
+        { id: "subscribe", title: "🔔 Subscribe", description: "RSS job alerts" },
+        { id: "unsubscribe", title: "🔕 Unsubscribe", description: "Stop alerts" },
+      ],
+    },
+    {
       title: "System",
       rows: [
         { id: "status", title: "📡 Status", description: "Connection health" },
@@ -191,25 +202,4 @@ export function mainMenuAsListSections(): ListSection[] {
       ],
     },
   ];
-}
-
-// ── Button response matchers ─────────────────────────────────────────
-
-export function getButtonId(text: string): string | null {
-  const lower = text.toLowerCase().trim();
-  const map: Record<string, string> = {
-    "🔍 scan jobs": "scan",
-    "📊 analyses": "analyses",
-    "📄 cvs": "cvs",
-    "📄 tailored cvs": "cvs",
-    "🖨️ render cv": "render",
-    "🎯 tailor cv": "chameleon",
-    "✉️ cover letter": "cover-letter",
-    "❓ question": "question",
-    "⭐ score cv": "score",
-    "📡 status": "status",
-    "🆕 new session": "new-session",
-    "⏹️ abort": "abort",
-  };
-  return map[lower] || null;
 }

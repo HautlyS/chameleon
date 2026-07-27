@@ -18,6 +18,10 @@ export const zh: I18nDictionary = {
   "cmd.description.opencode_start": "启动 OpenCode 服务器",
   "cmd.description.opencode_stop": "停止 OpenCode 服务器",
   "cmd.description.ls": "列出目录内容",
+  "cmd.description.chameleon": "完整定制流程：职位链接 → 定制简历",
+  "cmd.description.scan": "跨平台搜索职位",
+  "cmd.description.analyses": "查看已保存的职位分析",
+  "cmd.description.cvs": "查看已定制的简历",
   "cmd.description.help": "帮助",
 
   "callback.unknown_command": "未知命令",

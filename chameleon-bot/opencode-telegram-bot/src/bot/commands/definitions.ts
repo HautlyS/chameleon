@@ -48,6 +48,11 @@ const COMMAND_DEFINITIONS: BotCommandI18nDefinition[] = [
   { command: "cover_letter", descriptionKey: "cmd.description.cover_letter" },
   { command: "question", descriptionKey: "cmd.description.question" },
   { command: "score", descriptionKey: "cmd.description.score" },
+  { command: "ghost", descriptionKey: "cmd.description.ghost" },
+  { command: "review", descriptionKey: "cmd.description.review" },
+  { command: "mode", descriptionKey: "cmd.description.mode" },
+  { command: "subscribe", descriptionKey: "cmd.description.subscribe" },
+  { command: "unsubscribe", descriptionKey: "cmd.description.unsubscribe" },
   { command: "help", descriptionKey: "cmd.description.help" },
 ];
 

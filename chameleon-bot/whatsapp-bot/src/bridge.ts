@@ -100,10 +100,10 @@ export function tailorCv(
 ): string {
   const tmpPath = tempFile("jd", jdText);
   try {
-    const args = [tmpPath, "--json"];
+    const args = ["tailor", "--yaml", tmpPath, "--json"];
     if (company) args.push("--company", company);
     if (title) args.push("--title", title);
-    return runBridge(args, 180000, config); // 3 min timeout for tailor
+    return runBridge(args, 180000, config);
   } finally {
     try { unlinkSync(tmpPath); } catch {}
   }
@@ -116,7 +116,7 @@ export function coverLetter(
 ): string {
   const tmpPath = tempFile("cl_jd", jdText);
   try {
-    const args = [tmpPath, "--json"];
+    const args = ["cover-letter", "--yaml", tmpPath, "--json"];
     if (cvPath) args.push("--cv", cvPath);
     return runBridge(args, 120000, config);
   } finally {
@@ -132,7 +132,7 @@ export function answerQuestion(
 ): string {
   const qPath = tempFile("q", questionText);
   try {
-    const args = [qPath, "--json"];
+    const args = ["question", "--yaml", qPath, "--json"];
     if (jdText) {
       const jdPath = tempFile("q_jd", jdText);
       args.push("--jd", jdPath);
@@ -158,7 +158,7 @@ export function ghostPdf(
   extraTerms?: string,
   config?: Partial<BridgeConfig>,
 ): string {
-  const args = ["ghost", pdfPath, "--json"];
+  const args = ["ghost", "--yaml", pdfPath, "--json"];
   if (jdText) {
     const jdPath = tempFile("ghost_jd", jdText);
     args.push("--jd", jdPath);
@@ -174,7 +174,7 @@ export function reviewCv(
   config?: Partial<BridgeConfig>,
 ): string {
   const jdPath = tempFile("review_jd", jdText);
-  const args = [yamlPath, "--jd", jdPath, "--json"];
+  const args = ["review", "--yaml", yamlPath, "--jd", jdPath, "--json"];
   if (single) args.push("--single");
   return runBridge(args, 180000, config);
 }

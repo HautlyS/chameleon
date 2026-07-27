@@ -30,9 +30,47 @@ import { BOT_COMMANDS } from "../commands/definitions.js";
 import { logger } from "../../utils/logger.js";
 import { flushPendingPrompt } from "../handlers/message-merger.js";
 import { bridge } from "../../bridge/client.js";
-import { existsSync } from "fs";
-import { readFileSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { fileURLToPath } from "url";
 import path from "path";
+
+// ── Per-user routing mode (persisted to .chameleon/user_modes.json) ───
+const MODES_FILE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../.chameleon/user_modes.json");
+const userPreferOc = new Map<number, boolean>();
+
+function loadModes(): void {
+  try {
+    if (existsSync(MODES_FILE)) {
+      const data = JSON.parse(readFileSync(MODES_FILE, "utf-8")) as Record<string, boolean>;
+      for (const [key, val] of Object.entries(data)) userPreferOc.set(Number(key), val);
+    }
+  } catch { /* ignore corrupt file */ }
+}
+
+function saveModes(): void {
+  try {
+    const dir = path.resolve(MODES_FILE, "..");
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    const obj: Record<string, boolean> = {};
+    for (const [key, val] of userPreferOc) obj[String(key)] = val;
+    writeFileSync(MODES_FILE, JSON.stringify(obj, null, 2));
+  } catch { /* ignore write errors */ }
+}
+
+function setMode(chatId: number, useOc: boolean): void {
+  userPreferOc.set(chatId, useOc);
+  saveModes();
+}
+
+function preferOc(chatId: number): boolean {
+  return userPreferOc.get(chatId) ?? false;
+}
+
+function getModeLabel(chatId: number): string {
+  return preferOc(chatId) ? "OC-first" : "bridge-first";
+}
+
+loadModes();
 
 interface CommandRouterDeps {
   ensureEventSubscription: (directory: string) => Promise<void>;
@@ -77,14 +115,32 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
     await next();
   });
 
+  // ── Routing mode toggle ──────────────────────────────────────────
+  bot.command("mode", async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    const current = preferOc(chatId);
+    const newMode = !current;
+    // OC mode requires OpenCode to be running — we can't be sure here,
+    // so just set it; bridge commands will fall through to chameleonCommandHandler
+    setMode(chatId, newMode);
+    await ctx.reply(
+      `Routing mode: ${getModeLabel(chatId)}\n` +
+      (newMode
+        ? "All commands now go to OpenCode. No bridge used."
+        : "Bridge commands use local Python; AI commands go to OpenCode.")
+    );
+  });
+
   // Chameleon workflow commands — bridge-first for basic ops, OpenCode for AI
   const chameleonCtx: ChameleonCommandDeps = {
     bot,
     ensureEventSubscription: deps.ensureEventSubscription,
   };
 
-  // Bridge-backed commands (work without OpenCode)
+  // Bridge-backed commands (work without OpenCode, skip when OC-first)
   bot.command("scan", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const text = ctx.message?.text || "";
     const query = text.replace(/^\/scan\s*/i, "").trim();
     await ctx.reply("Scanning jobs...");
@@ -100,12 +156,12 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
         await ctx.reply(`Found ${jobs.length} jobs:\n\n${lines.join("\n\n")}`, { disable_web_page_preview: true });
       }
     } else {
-      // Fall back to OpenCode
       await chameleonCommandHandler(ctx, chameleonCtx);
     }
   });
 
   bot.command("analyses", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const result = bridge.listAnalyses();
     if (result.success && Array.isArray(result.data)) {
       const analyses = result.data as Array<Record<string, string>>;
@@ -123,6 +179,7 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
   });
 
   bot.command("cvs", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const result = bridge.listTailoredCvs();
     if (result.success && Array.isArray(result.data)) {
       const cvs = result.data as Array<Record<string, unknown>>;
@@ -140,6 +197,7 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
   });
 
   bot.command("render", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const text = ctx.message?.text || "";
     const yamlPath = text.replace(/^\/render\s*/i, "").trim();
     if (!yamlPath) {
@@ -165,6 +223,7 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
 
   // Ghost — inject ATS text
   bot.command("ghost", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const text = ctx.message?.text || "";
     const args = text.replace(/^\/ghost\s*/i, "").trim();
     const parts = args.split(/\s+/);
@@ -185,6 +244,7 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
 
   // Review — double AI review
   bot.command("review", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
     const text = ctx.message?.text || "";
     const parts = text.replace(/^\/review\s*/i, "").trim().split(/\s+/);
     const yamlPath = parts[0] || "";
@@ -206,10 +266,101 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
     }
   });
 
-  // AI-powered commands → OpenCode (no bridge equivalent)
-  for (const cmd of ["chameleon", "cover_letter", "question", "score"]) {
-    bot.command(cmd, (ctx) => chameleonCommandHandler(ctx, chameleonCtx));
-  }
+  // ── AI-powered commands: bridge-first with OpenCode fallback ─────────
+  bot.command("chameleon", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const text = ctx.message?.text || "";
+    const args = text.replace(/^\/chameleon\s*/i, "").trim();
+    await ctx.reply("Running full tailor workflow...");
+    const result = bridge.tailorCv(args.split(" ")[0] || "");
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      await ctx.reply((data.output as string) || "CV tailored successfully.");
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("cover_letter", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const text = ctx.message?.text || "";
+    const args = text.replace(/^\/cover_letter\s*/i, "").trim();
+    if (!args) {
+      await ctx.reply("Usage: /cover_letter <job-description-text>");
+      return;
+    }
+    await ctx.reply("Generating cover letter...");
+    const result = bridge.coverLetter(args);
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      await ctx.reply((data.cover_letter as string) || "Cover letter generated.");
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("question", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const text = ctx.message?.text || "";
+    const qText = text.replace(/^\/question\s*/i, "").trim();
+    if (!qText) {
+      await ctx.reply("Usage: /question <your question>");
+      return;
+    }
+    await ctx.reply("Answering question...");
+    const result = bridge.answerQuestion(qText);
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      await ctx.reply((data.answer as string) || "Question answered.");
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("score", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const text = ctx.message?.text || "";
+    const analysisId = text.replace(/^\/score\s*/i, "").trim();
+    if (!analysisId) {
+      await ctx.reply("Usage: /score <analysis-id>");
+      return;
+    }
+    await ctx.reply("Scoring CV...");
+    const result = bridge.scoreJob(analysisId);
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      const score = data.score ?? data.overall_score ?? "?";
+      await ctx.reply(`Score: ${score}/100\n\n${JSON.stringify(data, null, 2)}`);
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  // ── Subscribe / Unsubscribe for job alerts ──────────────────────────
+  bot.command("subscribe", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    await ctx.reply("Subscribing to RSS job alerts...");
+    const result = bridge.subscribe(String(chatId), "telegram");
+    if (result.success) {
+      await ctx.reply("Subscribed! You'll receive RSS job alerts here.");
+    } else {
+      await ctx.reply(`Subscription failed: ${result.error}`);
+    }
+  });
+
+  bot.command("unsubscribe", async (ctx) => {
+    if (preferOc(ctx.chat?.id ?? 0)) { await chameleonCommandHandler(ctx, chameleonCtx); return; }
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    const result = bridge.unsubscribe(String(chatId), "telegram");
+    if (result.success) {
+      await ctx.reply("Unsubscribed from RSS job alerts.");
+    } else {
+      await ctx.reply(`Unsubscription failed: ${result.error}`);
+    }
+  });
 
   bot.command("start", startCommand);
   bot.command("help", helpCommand);

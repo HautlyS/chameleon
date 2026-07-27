@@ -18,6 +18,10 @@ export const ru: I18nDictionary = {
   "cmd.description.opencode_start": "Запустить OpenCode сервер",
   "cmd.description.opencode_stop": "Остановить OpenCode сервер",
   "cmd.description.ls": "Список содержимого каталога",
+  "cmd.description.chameleon": "Полный процесс адаптации: URL вакансии → адаптированное резюме",
+  "cmd.description.scan": "Поиск вакансий на всех платформах",
+  "cmd.description.analyses": "Просмотр сохранённых анализов вакансий",
+  "cmd.description.cvs": "Просмотр адаптированных резюме",
   "cmd.description.help": "Справка",
 
   "callback.unknown_command": "Неизвестная команда",

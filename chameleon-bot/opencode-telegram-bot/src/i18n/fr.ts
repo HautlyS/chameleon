@@ -18,6 +18,10 @@ export const fr: I18nDictionary = {
   "cmd.description.opencode_start": "Démarrer le serveur OpenCode",
   "cmd.description.opencode_stop": "Arrêter le serveur OpenCode",
   "cmd.description.ls": "Lister le contenu du répertoire",
+  "cmd.description.chameleon": "Workflow complet d'adaptation : URL d'emploi → CV personnalisé",
+  "cmd.description.scan": "Rechercher des emplois sur toutes les plateformes",
+  "cmd.description.analyses": "Voir les analyses d'emploi sauvegardées",
+  "cmd.description.cvs": "Voir les CVs personnalisés",
   "cmd.description.help": "Aide",
 
   "callback.unknown_command": "Commande inconnue",

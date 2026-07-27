@@ -24,6 +24,11 @@ export const en = {
   "cmd.description.cover_letter": "Generate a cover letter from a job URL",
   "cmd.description.question": "Answer a screening question",
   "cmd.description.score": "Score a CV against a job analysis",
+  "cmd.description.ghost": "Inject ATS ghost text into a PDF",
+  "cmd.description.review": "Double AI review of a tailored CV",
+  "cmd.description.mode": "Toggle bridge-first / OC-first routing",
+  "cmd.description.subscribe": "Subscribe to RSS job alerts",
+  "cmd.description.unsubscribe": "Unsubscribe from RSS job alerts",
   "cmd.description.help": "Help",
 
   "callback.unknown_command": "Unknown command",

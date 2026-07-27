@@ -24,6 +24,7 @@ def main():
     ap.add_argument("--single", action="store_true", help="Single review instead of double")
     ap.add_argument("--subscribe", default="", help="Phone number to subscribe for RSS alerts")
     ap.add_argument("--unsubscribe", default="", help="Phone number to unsubscribe from RSS alerts")
+    ap.add_argument("--telegram", default="", help="Chat ID for Telegram subscribe/unsubscribe")
     ap.add_argument("--json", action="store_true", help="JSON output")
 
     args = ap.parse_args()
@@ -210,34 +211,30 @@ def _run_command(args, client, ap):
                 print(f"  Error: {result.get('error', 'unknown')}")
 
     elif args.command == "subscribe":
-        if not args.subscribe:
-            print(json.dumps({"error": "--subscribe with phone number is required"}))
+        channel = "telegram" if args.telegram else "whatsapp"
+        identifier = args.telegram or args.subscribe
+        if not identifier:
+            print(json.dumps({"error": "--subscribe <phone> or --telegram <chat_id> is required"}))
             sys.exit(1)
-        config_subs = config._data.get("bridge", {})
-        whatsapp_subs = config_subs.get("whatsapp", {}).get("notify_numbers", [])
-        phone = args.subscribe
-        if phone not in whatsapp_subs:
-            whatsapp_subs.append(phone)
-            config_subs.setdefault("whatsapp", {})["notify_numbers"] = whatsapp_subs
-            if "bridge" not in config._data:
-                config._data["bridge"] = {}
-            config._data["bridge"] = config_subs
+        config_subs = config._data.setdefault("bridge", {})
+        subs_list = config_subs.setdefault(channel, {}).setdefault("notify_numbers" if channel == "whatsapp" else "notify_chat_ids", [])
+        if identifier not in subs_list:
+            subs_list.append(identifier)
             config.save()
-        print(json.dumps({"success": True, "subscribed": phone, "all_subscribers": whatsapp_subs}))
+        print(json.dumps({"success": True, channel: identifier, "all_subscribers": subs_list}))
 
     elif args.command == "unsubscribe":
-        if not args.unsubscribe:
-            print(json.dumps({"error": "--unsubscribe with phone number is required"}))
+        channel = "telegram" if args.telegram else "whatsapp"
+        identifier = args.telegram or args.unsubscribe
+        if not identifier:
+            print(json.dumps({"error": "--unsubscribe <phone> or --telegram <chat_id> is required"}))
             sys.exit(1)
-        config_subs = config._data.get("bridge", {})
-        whatsapp_subs = config_subs.get("whatsapp", {}).get("notify_numbers", [])
-        phone = args.unsubscribe
-        if phone in whatsapp_subs:
-            whatsapp_subs.remove(phone)
-            config_subs.setdefault("whatsapp", {})["notify_numbers"] = whatsapp_subs
-            config._data["bridge"] = config_subs
+        config_subs = config._data.setdefault("bridge", {})
+        subs_list = config_subs.setdefault(channel, {}).setdefault("notify_numbers" if channel == "whatsapp" else "notify_chat_ids", [])
+        if identifier in subs_list:
+            subs_list.remove(identifier)
             config.save()
-        print(json.dumps({"success": True, "unsubscribed": phone, "all_subscribers": whatsapp_subs}))
+        print(json.dumps({"success": True, "unsubscribed": identifier, "all_subscribers": subs_list}))
 
     else:
         ap.print_help()

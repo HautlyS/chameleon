@@ -22,10 +22,11 @@ export async function chameleonCommandHandler(
   // Strip the leading /command (handles both /cmd and /cmd@botname)
   const rest = text.replace(/^\/\w+(?:@\w+)?\s*/, "").trim();
 
-  // Build a prompt the chameleon skills can parse
-  const prompt = rest ? text : text.split(/\s+/)[0];
+  // Build a clean prompt: command + args, without the leading /
+  const command = text.split(/\s+/)[0].replace(/^\/|@\w+$/g, "").toLowerCase();
+  const prompt = rest ? `${command} ${rest}` : command;
 
-  logger.info(`[Bot] Forwarding chameleon command: ${prompt}`);
+  logger.info(`[Bot] Forwarding chameleon command: /${command}${rest ? ` ${rest}` : ""}`);
 
   await processUserPrompt(ctx, prompt, {
     bot: deps.bot,
