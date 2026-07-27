@@ -158,3 +158,44 @@ class ChameleonClient:
             "md": str(self.root / "output" / f"{stem}.md"),
             "error": result.stderr.strip() if result.returncode != 0 else None,
         }
+
+    def cover_letter(self, jd_text: str, cv_path: str | Path | None = None) -> dict[str, Any]:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(jd_text)
+            jd_path = f.name
+
+        try:
+            args = [jd_path, "--json"]
+            if cv_path:
+                args.extend(["--cv", str(cv_path)])
+            result = self._run_script("scripts.cover_letter", args)
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            return {"success": False, "error": result.stderr.strip() or result.stdout.strip()}
+        except (json.JSONDecodeError, Exception) as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            Path(jd_path).unlink(missing_ok=True)
+
+    def answer_question(self, question_text: str, jd_text: str = "", cv_path: str | Path | None = None) -> dict[str, Any]:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            f.write(question_text)
+            q_path = f.name
+
+        try:
+            args = [q_path, "--json"]
+            if jd_text:
+                with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as jf:
+                    jf.write(jd_text)
+                    jd_path = jf.name
+                args.extend(["--jd", jd_path])
+            if cv_path:
+                args.extend(["--cv", str(cv_path)])
+            result = self._run_script("scripts.question", args)
+            if result.returncode == 0:
+                return json.loads(result.stdout)
+            return {"success": False, "error": result.stderr.strip() or result.stdout.strip()}
+        except (json.JSONDecodeError, Exception) as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            Path(q_path).unlink(missing_ok=True)

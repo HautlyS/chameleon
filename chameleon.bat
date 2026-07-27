@@ -38,6 +38,8 @@ if /I "%~1"=="render" goto :render
 if /I "%~1"=="init" goto :init
 if /I "%~1"=="init-cv" goto :init
 if /I "%~1"=="tui" goto :tui
+if /I "%~1"=="setup" goto :setup
+if /I "%~1"=="install" goto :setup
 
 echo Unknown command: %~1
 echo Run 'chameleon help' for usage.
@@ -217,6 +219,45 @@ call tui.bat %*
 exit /b %errorlevel%
 
 REM ════════════════════════════════════════════════════════════════════════
+REM  SETUP
+REM ════════════════════════════════════════════════════════════════════════
+:setup
+cd /d "%CHAMELEON_DIR%"
+echo [*] Chameleon Setup
+echo.
+if not exist "%VENV_PYTHON%" (
+    echo [1/5] Creating Python virtual environment...
+    python -m venv .venv
+    echo   Done.
+) else (
+    echo [1/5] Virtual environment exists.
+)
+echo [2/5] Installing core dependencies (textual, pyyaml, httpx)...
+"%VENV_PYTHON%" -m pip install --quiet textual pyyaml httpx reportlab beautifulsoup4 lxml markdownify 2>nul
+if %errorlevel% equ 0 ( echo   Done. ) else ( echo   Warning: Some deps failed. )
+echo [3/5] Installing RenderCV (PDF generation)...
+"%VENV_PYTHON%" -m pip install --quiet "rendercv[full]" 2>nul
+echo [4/5] Installing Playwright (browser automation for blocked job sites)...
+"%VENV_PYTHON%" -m pip install --quiet playwright 2>nul
+if %errorlevel% equ 0 (
+    echo   Installing Chromium browser (~150MB)...
+    "%VENV_PYTHON%" -m playwright install chromium 2>nul
+    echo   Done.
+) else ( echo   Warning: Playwright install failed (optional). )
+echo [5/5] Creating default config...
+if not exist ".chameleon\config.json" (
+    mkdir .chameleon 2>nul
+    mkdir output\job_analyses 2>nul
+    mkdir output\cover_letters 2>nul
+    echo   Done.
+) else ( echo   Config already exists. )
+echo.
+echo [*] Setup complete!
+echo     Run: chameleon help
+echo     Run: chameleon tui
+exit /b 0
+
+REM ════════════════════════════════════════════════════════════════════════
 REM  HELP
 REM ════════════════════════════════════════════════════════════════════════
 :help
@@ -230,6 +271,7 @@ echo   chameleon cover ^<jd_text_or_url_or_file^> [options]   Generate cover let
 echo   chameleon render ^<yaml_path^>                         Render YAML to PDF
 echo   chameleon init ^<pdf_or_yaml_path^>                    Import master CV
 echo   chameleon tui                                        Launch the TUI
+echo   chameleon setup                                      Install all dependencies
 echo   chameleon help                                       Show this help
 echo.
 echo TAILOR options:

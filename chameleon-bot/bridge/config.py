@@ -85,6 +85,11 @@ class BridgeConfig:
         return self._data.get("whatsapp", {}).get("notifications_enabled", True)
 
     @property
+    def whatsapp_notify_number(self) -> str:
+        env = os.environ.get("WHATSAPP_NOTIFY_NUMBER", "")
+        return env or self._data.get("whatsapp", {}).get("notify_number", "")
+
+    @property
     def rss_enabled(self) -> bool:
         return self._data.get("rss", {}).get("enabled", True)
 

@@ -44,10 +44,16 @@ fi
 # Ensure venv exists
 if [[ ! -f "$VENV_PYTHON" ]]; then
     echo "[!] Virtual environment not found at $VENV_PYTHON"
-    echo "    Run: make install-tools"
-    echo "    Or: python3 -m venv .venv && .venv/bin/pip install textual pyyaml pypdf reportlab httpx beautifulsoup4 lxml markdownify"
+    echo "    Run: ./chameleon setup"
+    echo "    Or: python3 -m venv .venv && .venv/bin/pip install textual pyyaml httpx reportlab beautifulsoup4 lxml markdownify"
     exit 1
 fi
+
+# Quick dep check
+$VENV_PYTHON -c "import textual" 2>/dev/null || {
+    echo "[!] textual not installed. Run: $VENV_PYTHON -m pip install textual pyyaml httpx"
+    exit 1
+}
 
 cd "$CHAMELEON_DIR" || exit 1
 exec "$VENV_PYTHON" -m scripts.tui_app "$@"

@@ -1,4 +1,5 @@
 import type { Bot, Context, NextFunction } from "grammy";
+import { InputFile } from "grammy";
 import { config } from "../../config.js";
 import { settingsCommand } from "../commands/settings-command.js";
 import { opencodeStartCommand } from "../commands/opencode-start-command.js";
@@ -28,6 +29,10 @@ import {
 import { BOT_COMMANDS } from "../commands/definitions.js";
 import { logger } from "../../utils/logger.js";
 import { flushPendingPrompt } from "../handlers/message-merger.js";
+import { bridge } from "../../bridge/client.js";
+import { existsSync } from "fs";
+import { readFileSync } from "fs";
+import path from "path";
 
 interface CommandRouterDeps {
   ensureEventSubscription: (directory: string) => Promise<void>;
@@ -72,12 +77,94 @@ export function registerCommandRouter(bot: Bot<Context>, deps: CommandRouterDeps
     await next();
   });
 
-  // Chameleon workflow commands → forwarded to OpenCode
+  // Chameleon workflow commands — bridge-first for basic ops, OpenCode for AI
   const chameleonCtx: ChameleonCommandDeps = {
     bot,
     ensureEventSubscription: deps.ensureEventSubscription,
   };
-  for (const cmd of ["chameleon", "scan", "analyses", "cvs", "render", "cover_letter", "question", "score"]) {
+
+  // Bridge-backed commands (work without OpenCode)
+  bot.command("scan", async (ctx) => {
+    const text = ctx.message?.text || "";
+    const query = text.replace(/^\/scan\s*/i, "").trim();
+    await ctx.reply("Scanning jobs...");
+    const result = bridge.scanJobs(query);
+    if (result.success && Array.isArray(result.data)) {
+      const jobs = result.data as Array<Record<string, unknown>>;
+      if (jobs.length === 0) {
+        await ctx.reply("No jobs found.");
+      } else {
+        const lines = jobs.slice(0, 5).map((j) =>
+          `• ${j.title} @ ${j.company}\n  ${j.url || ""}`
+        );
+        await ctx.reply(`Found ${jobs.length} jobs:\n\n${lines.join("\n\n")}`, { disable_web_page_preview: true });
+      }
+    } else {
+      // Fall back to OpenCode
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("analyses", async (ctx) => {
+    const result = bridge.listAnalyses();
+    if (result.success && Array.isArray(result.data)) {
+      const analyses = result.data as Array<Record<string, string>>;
+      if (analyses.length === 0) {
+        await ctx.reply("No saved analyses.");
+      } else {
+        const lines = analyses.slice(0, 10).map((a) =>
+          `• ${a.id} — ${a.company} / ${a.role}`
+        );
+        await ctx.reply(`Analyses:\n${lines.join("\n")}`);
+      }
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("cvs", async (ctx) => {
+    const result = bridge.listTailoredCvs();
+    if (result.success && Array.isArray(result.data)) {
+      const cvs = result.data as Array<Record<string, unknown>>;
+      if (cvs.length === 0) {
+        await ctx.reply("No tailored CVs.");
+      } else {
+        const lines = cvs.slice(0, 10).map((c) =>
+          `• ${c.title} @ ${c.company} — Score: ${c.score}`
+        );
+        await ctx.reply(`Tailored CVs:\n${lines.join("\n")}`);
+      }
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  bot.command("render", async (ctx) => {
+    const text = ctx.message?.text || "";
+    const yamlPath = text.replace(/^\/render\s*/i, "").trim();
+    if (!yamlPath) {
+      await ctx.reply("Usage: /render <yaml_path>");
+      return;
+    }
+    await ctx.reply("Rendering CV...");
+    const result = bridge.renderCv(yamlPath);
+    if (result.success) {
+      const data = result.data as Record<string, unknown> || {};
+      const pdfPath = data.pdf as string || "";
+      if (pdfPath && existsSync(pdfPath)) {
+        await ctx.replyWithDocument(new InputFile(readFileSync(pdfPath), path.basename(pdfPath)), {
+          caption: `Rendered CV: ${path.basename(yamlPath)}`,
+        });
+      } else {
+        await ctx.reply(`PDF ready: ${pdfPath || "(unknown path)"}`);
+      }
+    } else {
+      await chameleonCommandHandler(ctx, chameleonCtx);
+    }
+  });
+
+  // AI-powered commands → OpenCode (no bridge equivalent)
+  for (const cmd of ["chameleon", "cover_letter", "question", "score"]) {
     bot.command(cmd, (ctx) => chameleonCommandHandler(ctx, chameleonCtx));
   }
 

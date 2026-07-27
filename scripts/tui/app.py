@@ -387,6 +387,8 @@ class ChameleonTUI(App):
             self.set_timer(0.3, self._show_setup_wizard)
         elif not s.get("has_repos"):
             self.notify("GitHub profile has no repos. Scoring will be limited. Press F3 for Setup Wizard.", timeout=6)
+        elif not s.get("browser_available"):
+            self.notify("Browser automation not installed. LinkedIn/Indeed/Wellfound won't work. Run: make install-playwright", timeout=8)
 
     def _show_setup_wizard(self) -> None:
         def _on_result(result: bool | None) -> None:
@@ -440,6 +442,13 @@ class ChameleonTUI(App):
         profile_ok = PROFILE_PATH.exists()
         has_repos = len(self.profile.get("repos", [])) > 0 if profile_ok else False
         profile_repo_count = len(self.profile.get("repos", [])) if profile_ok else 0
+        # Check browser automation availability
+        browser_ok = False
+        try:
+            from scripts.job_scanner.browser import is_playwright_available
+            browser_ok = is_playwright_available()
+        except Exception:
+            pass
         return {
             "cv_exists": cv_ok,
             "cv_path": str(CV_PATH),
@@ -448,6 +457,7 @@ class ChameleonTUI(App):
             "profile_path": str(PROFILE_PATH),
             "has_repos": has_repos,
             "profile_repo_count": profile_repo_count,
+            "browser_available": browser_ok,
         }
 
     def _update_status(self) -> None:
@@ -466,6 +476,14 @@ class ChameleonTUI(App):
                 setup_warn = "  \u26a0 [bold yellow]SETUP:[/bold yellow] GitHub profile missing  "
             elif s["profile_exists"] and not s["has_repos"]:
                 setup_warn = "  \u26a0 [bold yellow]SETUP:[/bold yellow] Profile has no repos  "
+
+            # Browser status
+            browser_status = ""
+            if s.get("browser_available"):
+                browser_status = "  \U0001f310 [green]Browser[/green]  "
+            else:
+                browser_status = "  \U0001f310 [dim]No browser[/dim]  "
+            setup_warn += browser_status
 
             # Job count with filtering info
             if self._search_query:

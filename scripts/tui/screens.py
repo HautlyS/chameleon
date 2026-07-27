@@ -540,6 +540,18 @@ class SetupWizardScreen(ModalScreen[bool]):
             "[dim]Review your configuration. Press Finish to save.[/dim]",
             "",
         ]
+        # Check browser automation
+        browser_ok = False
+        try:
+            from scripts.job_scanner.browser import is_playwright_available
+            browser_ok = is_playwright_available()
+        except Exception:
+            pass
+        browser_icon = "[green]\u2713[/green]" if browser_ok else "[yellow]\u26a0[/yellow]"
+        lines.append(f"[bold]Browser Automation:[/bold]")
+        lines.append(f"  {browser_icon} Playwright + Chromium ({'Available' if browser_ok else 'Not installed - run: make install-playwright'})")
+        lines.append("")
+
         sections = [
             ("CV & Profile", ["master_cv_path", "profile_path"]),
             ("AI Reviewer", ["opencode_bin_path", "opencode_api_url", "model_provider", "model_id"]),

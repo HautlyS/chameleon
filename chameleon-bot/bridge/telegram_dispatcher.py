@@ -69,5 +69,49 @@ class TelegramDispatcher:
             msg.append(f"📄 PDF: `{pdf_path}`")
         return self.send_message("\n".join(msg))
 
+    def send_document(self, file_path: str, caption: str = "", chat_id: int | None = None) -> bool:
+        """Send a file as a document. Falls back to text message if send fails."""
+        import mimetypes
+        targets = [chat_id] if chat_id else self.allowed_user_ids
+        ok = True
+        for uid in targets:
+            try:
+                import urllib.parse
+                url = f"{self._api_base}/sendDocument"
+                import os
+                with open(file_path, "rb") as f:
+                    file_data = f.read()
+                boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW"
+                filename = os.path.basename(file_path)
+                body = []
+                body.append(f"--{boundary}")
+                body.append(f'Content-Disposition: form-data; name="chat_id"')
+                body.append("")
+                body.append(str(uid))
+                body.append(f"--{boundary}")
+                body.append(f'Content-Disposition: form-data; name="document"; filename="{filename}"')
+                body.append("Content-Type: application/octet-stream")
+                body.append("")
+                body.append(file_data.decode("latin-1"))
+                if caption:
+                    body.append(f"--{boundary}")
+                    body.append(f'Content-Disposition: form-data; name="caption"')
+                    body.append("")
+                    body.append(caption[:1024])
+                body.append(f"--{boundary}--")
+                payload = "\r\n".join(body)
+                req = urllib.request.Request(
+                    url, data=payload.encode("latin-1"),
+                    headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    result = json.loads(resp.read().decode())
+                if not result.get("ok"):
+                    ok = False
+            except Exception as e:
+                ok = False
+        return ok
+
     def send_error(self, error_msg: str) -> bool:
         return self.send_message(f"⚠️ *Chameleon Error*\n{error_msg}")

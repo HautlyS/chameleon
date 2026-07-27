@@ -12,6 +12,30 @@ install-tools:
 	$(PIP) install --quiet "rendercv[full]"
 	@echo "rendercv installed."
 
+# Full setup — install everything needed
+setup:
+	@echo "[Chameleon Setup]"
+	@echo ""
+	@echo "[1/5] Creating virtual environment..."
+	python3 -m venv $(VENV) 2>/dev/null || true
+	@echo "[2/5] Installing core dependencies..."
+	$(PIP) install --quiet textual pyyaml httpx reportlab beautifulsoup4 lxml markdownify
+	@echo "[3/5] Installing RenderCV..."
+	$(PIP) install --quiet "rendercv[full]" || true
+	@echo "[4/5] Installing Playwright (browser automation)..."
+	$(PIP) install --quiet playwright || true
+	$(PYTHON) -m playwright install chromium 2>/dev/null || echo "  (Chromium install deferred)"
+	@echo "[5/5] Creating default config..."
+	mkdir -p .chameleon output/job_analyses output/cover_letters
+	@echo ""
+	@echo "Setup complete! Run: make list-platforms  or  ./chameleon tui"
+
+# Install Playwright browser automation (for LinkedIn/Indeed/Wellfound)
+install-playwright:
+	$(PIP) install --quiet playwright
+	$(PYTHON) -m playwright install chromium
+	@echo "Playwright + Chromium installed. Blocked job sites (LinkedIn, Indeed, etc.) will now work."
+
 install-deps:
 	$(PIP) install --quiet -r requirements.txt
 	@echo "Python deps installed."

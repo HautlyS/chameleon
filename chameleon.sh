@@ -97,6 +97,7 @@ Usage:
   chameleon cover <jd_text_or_url_or_file> [options]   Generate cover letter
   chameleon render <yaml_path>                         Render YAML to PDF
   chameleon init <pdf_or_yaml_path>                    Import master CV
+  chameleon setup                                      Install all dependencies
   chameleon tui                                        Launch the TUI
   chameleon help                                       Show this help
 
@@ -324,6 +325,65 @@ case "$COMMAND" in
     tui)
         cd "$CHAMELEON_DIR"
         exec ./tui.sh "$@"
+        ;;
+
+    setup|install)
+        cd "$CHAMELEON_DIR"
+        echo "[*] Chameleon Setup" >&2
+        echo ""
+
+        # Step 1: Virtual environment
+        if [[ ! -f "$VENV_PYTHON" ]]; then
+            echo "[1/5] Creating Python virtual environment..." >&2
+            python3 -m venv .venv
+            echo "  Done." >&2
+        else
+            echo "[1/5] Virtual environment exists." >&2
+        fi
+
+        # Step 2: Core dependencies
+        echo "[2/5] Installing core dependencies (textual, pyyaml, httpx, reportlab)..." >&2
+        "$VENV_PYTHON" -m pip install --quiet textual pyyaml httpx reportlab beautifulsoup4 lxml markdownify
+        if [[ $? -eq 0 ]]; then
+            echo "  Done." >&2
+        else
+            echo "  Warning: Some core deps failed. Check pip." >&2
+        fi
+
+        # Step 3: RenderCV
+        echo "[3/5] Installing RenderCV (PDF generation)..." >&2
+        "$VENV_PYTHON" -m pip install --quiet "rendercv[full]"
+        if [[ $? -eq 0 ]]; then
+            echo "  Done." >&2
+        else
+            echo "  Warning: RenderCV install failed (optional, for PDF generation)." >&2
+        fi
+
+        # Step 4: Playwright for browser automation
+        echo "[4/5] Installing Playwright (browser automation for blocked job sites)..." >&2
+        "$VENV_PYTHON" -m pip install --quiet playwright
+        if [[ $? -eq 0 ]]; then
+            echo "  Installing Chromium browser (~150MB)..." >&2
+            "$VENV_PYTHON" -m playwright install chromium 2>&1 || echo "  Warning: Chromium install failed (optional)." >&2
+            echo "  Done." >&2
+        else
+            echo "  Warning: Playwright install failed (optional, for LinkedIn/Indeed/Wellfound)." >&2
+        fi
+
+        # Step 5: Config
+        echo "[5/5] Creating default config..." >&2
+        mkdir -p .chameleon output/job_analyses output/cover_letters
+        if [[ ! -f .chameleon/config.json ]]; then
+            "$VENV_PYTHON" -c "from scripts.config import config; config.persist()" 2>/dev/null || true
+            echo "  Done." >&2
+        else
+            echo "  Config already exists." >&2
+        fi
+
+        echo ""
+        echo "[*] Setup complete!" >&2
+        echo "    Run: ./chameleon help" >&2
+        echo "    Run: ./chameleon tui" >&2
         ;;
 
     help|--help|-h)

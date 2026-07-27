@@ -11,7 +11,14 @@ import {
   listAnalyses,
   listTailoredCvs,
   renderCv,
+  tailorCv,
+  coverLetter,
+  answerQuestion,
+  scoreJob,
 } from "./bridge.js";
+
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
 import {
   sendButtonMenu,
@@ -304,6 +311,13 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
       const parsed = JSON.parse(result) as Record<string, unknown>;
       if (parsed.success) {
         await sendWhatsAppMessage(sender, `PDF ready: ${parsed.pdf}`);
+        // Try to send the PDF as media
+        const pdfPath = parsed.pdf as string;
+        if (pdfPath) {
+          try {
+            await sendWhatsAppMedia(sender, pdfPath);
+          } catch {}
+        }
       } else {
         await sendWhatsAppMessage(sender, `Render failed: ${parsed.error}`);
       }
@@ -313,31 +327,107 @@ async function handleWebhookEvent(event: Record<string, unknown>): Promise<void>
     return;
   }
 
-  // ── Chameleon AI commands (require OpenCode) ────────────────────────
-  if (lower.startsWith("/chameleon") || lower.startsWith("/cover-letter") || lower.startsWith("/question") || lower.startsWith("/score")) {
-    if (!hasOc || !await ensureOcReady()) {
-      await sendWhatsAppMessage(sender, "This command requires OpenCode. Set OC_ENABLED=true and configure OPENCODE_API_URL.");
-      return;
-    }
-    if (isBusy()) {
-      await sendWhatsAppMessage(sender, "Still working on the previous task. Send /abort to stop it, or wait.");
-      return;
-    }
+  // ── Chameleon AI commands (bridge-first, fall back to OpenCode) ─────
+  if (lower.startsWith("/chameleon")) {
+    const args = text.replace(/^\/chameleon\s*/i, "").trim();
+    await sendWhatsAppMessage(sender, "Running full tailor workflow...");
     try {
-      await sendPrompt(ocConfig, text);
-      markBusy();
-      await sendWhatsAppMessage(sender, "Processing...");
-      const reply = await waitForResponse(180_000);
-      if (!reply || reply.trim() === "") {
-        await sendWhatsAppMessage(sender, "(No response)");
-      } else {
+      const urlOrJd = args.split(" ")[0] || "";
+      const result = tailorCv(urlOrJd);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      if (parsed.success) {
+        let reply = parsed.output as string || "CV tailored successfully.";
         const chunks = splitMessage(reply, 4000);
         for (const chunk of chunks) {
           await sendWhatsAppMessage(sender, chunk);
         }
+      } else if (hasOc && await ensureOcReady()) {
+        await sendWhatsAppMessage(sender, "Bridge tailor unavailable. Trying OpenCode...");
+        await sendPrompt(ocConfig, text);
+        markBusy();
+        const reply = await waitForResponse(180_000);
+        const chunks = splitMessage(reply || "(No response)", 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else {
+        await sendWhatsAppMessage(sender, `Tailor failed: ${parsed.error}`);
       }
     } catch (err) {
-      markIdle();
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower.startsWith("/cover-letter")) {
+    const args = text.replace(/^\/cover-letter\s*/i, "").trim();
+    await sendWhatsAppMessage(sender, "Generating cover letter...");
+    try {
+      const result = coverLetter(args);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      if (parsed.success) {
+        const chunks = splitMessage(parsed.cover_letter as string || "", 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else if (hasOc && await ensureOcReady()) {
+        await sendWhatsAppMessage(sender, "Bridge cover letter unavailable. Trying OpenCode...");
+        await sendPrompt(ocConfig, text);
+        markBusy();
+        const reply = await waitForResponse(180_000);
+        const chunks = splitMessage(reply || "(No response)", 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else {
+        await sendWhatsAppMessage(sender, `Cover letter failed: ${parsed.error}`);
+      }
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower.startsWith("/question")) {
+    const qText = text.replace(/^\/question\s*/i, "").trim();
+    if (!qText) {
+      await sendWhatsAppMessage(sender, "Usage: /question <your question> [--jd <job-description>]");
+      return;
+    }
+    await sendWhatsAppMessage(sender, "Answering question...");
+    try {
+      const result = answerQuestion(qText);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      if (parsed.success) {
+        const chunks = splitMessage(parsed.answer as string || "", 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else if (hasOc && await ensureOcReady()) {
+        await sendWhatsAppMessage(sender, "Bridge question unavailable. Trying OpenCode...");
+        await sendPrompt(ocConfig, text);
+        markBusy();
+        const reply = await waitForResponse(180_000);
+        const chunks = splitMessage(reply || "(No response)", 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else {
+        await sendWhatsAppMessage(sender, `Question failed: ${parsed.error}`);
+      }
+    } catch (err) {
+      await sendWhatsAppMessage(sender, `Error: ${err}`);
+    }
+    return;
+  }
+
+  if (lower.startsWith("/score")) {
+    const analysisId = text.replace(/^\/score\s*/i, "").trim();
+    if (!analysisId) {
+      await sendWhatsAppMessage(sender, "Usage: /score <analysis-id>");
+      return;
+    }
+    await sendWhatsAppMessage(sender, "Scoring CV...");
+    try {
+      const result = scoreJob(analysisId);
+      const parsed = JSON.parse(result) as Record<string, unknown>;
+      if (!parsed.error) {
+        const chunks = splitMessage(JSON.stringify(parsed, null, 2), 4000);
+        for (const chunk of chunks) await sendWhatsAppMessage(sender, chunk);
+      } else {
+        await sendWhatsAppMessage(sender, `Score error: ${parsed.error}`);
+      }
+    } catch (err) {
       await sendWhatsAppMessage(sender, `Error: ${err}`);
     }
     return;
@@ -425,6 +515,47 @@ function splitMessage(text: string, maxLen: number): string[] {
 }
 
 // ── WhatsApp Sender ──────────────────────────────────────────────────
+
+async function sendWhatsAppMedia(to: string, filePath: string): Promise<void> {
+  const apiBase = process.env.EVOLUTION_API_URL || "http://localhost:8080";
+  const apiKey = process.env.EVOLUTION_API_KEY || "";
+  const instanceName = process.env.WHATSAPP_INSTANCE_NAME || "chameleon";
+
+  try {
+    const absPath = resolve(filePath);
+    const fileData = readFileSync(absPath);
+    const filename = filePath.split("/").pop() || filePath.split("\\").pop() || "cv.pdf";
+    const boundary = "----ChameleonFormBoundary";
+    const encoder = new TextEncoder();
+
+    const parts: Uint8Array[] = [];
+    const push = (s: string) => parts.push(encoder.encode(s));
+    const pushBytes = (b: Uint8Array) => parts.push(b);
+
+    push(`--${boundary}\r\n`);
+    push(`Content-Disposition: form-data; name="number"\r\n\r\n`);
+    push(`${to}\r\n`);
+    push(`--${boundary}\r\n`);
+    push(`Content-Disposition: form-data; name="mediatype"\r\n\r\n`);
+    push(`document\r\n`);
+    push(`--${boundary}\r\n`);
+    push(`Content-Disposition: form-data; name="file"; filename="${filename}"\r\n`);
+    push(`Content-Type: application/pdf\r\n\r\n`);
+    pushBytes(fileData);
+    push(`\r\n`);
+    push(`--${boundary}--\r\n`);
+
+    const body = new Blob(parts);
+    const url = `${apiBase}/message/sendMedia/${instanceName}`;
+    await fetch(url, {
+      method: "POST",
+      headers: { apikey: apiKey },
+      body,
+    });
+  } catch (err) {
+    console.error("[chameleon-whatsapp] Media send error:", err);
+  }
+}
 
 async function sendWhatsAppMessage(to: string, text: string): Promise<void> {
   const apiBase = process.env.EVOLUTION_API_URL || "http://localhost:8080";
